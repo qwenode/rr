@@ -12,25 +12,25 @@ func TestRString_JsonUnmarshal(t *testing.T) {
     }
     tests := []struct {
         name    string
-        r       RString
+        r       S
         args    args
         wantErr bool
     }{
         {
             "正常情况有效 JSON 字符串和正确类型接收对象",
-            RString(`{"key": "value"}`),
+            S(`{"key": "value"}`),
             args{&struct{ Key string }{Key: ""}},
             false,
         },
         {
             "边界情况空字符串",
-            RString(""),
+            S(""),
             args{&struct{}{}},
             true,
         },
         {
             "错误输入无效 JSON 字符串",
-            RString("invalid_json"),
+            S("invalid_json"),
             args{&struct{}{}},
             true,
         },
@@ -50,27 +50,27 @@ func TestRString_UrlDecode(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常情况非空字符串",
-            RString("encoded_value"),
+            S("encoded_value"),
             args{},
-            RString("encoded_value"), // 假设实际解码后的结果
+            S("encoded_value"), // 假设实际解码后的结果
         },
         {
             "边界情况空字符串",
-            RString(""),
+            S(""),
             args{},
-            RString(""),
+            S(""),
         },
         {
             "逻辑检查特殊编码字符串",
-            RString("%2B"),
+            S("%2B"),
             args{},
-            RString("+"),
+            S("+"),
         },
     }
     for _, tt := range tests {
@@ -85,7 +85,7 @@ func TestRString_UrlDecode(t *testing.T) {
 }
 func TestRString_ToUrl(t *testing.T) {
     type args struct {
-        r     RString
+        r     S
         https []bool
     }
     tests := []struct {
@@ -95,22 +95,22 @@ func TestRString_ToUrl(t *testing.T) {
     }{
         {
             "有内容且不指定 https 为 http 格式",
-            args{RString("example.com"), []bool{}},
+            args{S("example.com"), []bool{}},
             "http://example.com",
         },
         {
             "有内容且指定 https 为 https 格式",
-            args{RString("example.com"), []bool{true}},
+            args{S("example.com"), []bool{true}},
             "https://example.com",
         },
         {
             "已有协议的内容且不指定 https 保留原协议",
-            args{RString("http://example.org"), []bool{}},
+            args{S("http://example.org"), []bool{}},
             "http://example.org",
         },
         {
             "空字符串",
-            args{RString(""), []bool{}},
+            args{S(""), []bool{}},
             "",
         },
     }
@@ -126,7 +126,7 @@ func TestRString_ToUrl(t *testing.T) {
 }
 func TestRString_IsUrl(t *testing.T) {
     type args struct {
-        r RString
+        r S
     }
     tests := []struct {
         name string
@@ -135,22 +135,22 @@ func TestRString_IsUrl(t *testing.T) {
     }{
         {
             "有效 URL",
-            args{RString("https://example.com")},
+            args{S("https://example.com")},
             true,
         },
         {
             "另一个有效 URL",
-            args{RString("http://example.org")},
+            args{S("http://example.org")},
             true,
         },
         {
             "无效 URL",
-            args{RString("invalid-url")},
+            args{S("invalid-url")},
             false,
         },
         {
             "空字符串",
-            args{RString("")},
+            args{S("")},
             false,
         },
     }
@@ -166,22 +166,22 @@ func TestRString_IsUrl(t *testing.T) {
 }
 func TestGetFirst(t *testing.T) {
     // 测试包含分隔符的情况
-    r := RString("apple,banana,cherry")
-    expected := RString("apple")
+    r := S("apple,banana,cherry")
+    expected := S("apple")
     result := r.GetFirst(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
     }
     
     // 测试不包含分隔符的情况
-    r = RString("orange")
-    expected = RString("orange")
+    r = S("orange")
+    expected = S("orange")
     result = r.GetFirst(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
     }
-    r = RString(",orange")
-    expected = RString("")
+    r = S(",orange")
+    expected = S("")
     result = r.GetFirst(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
@@ -189,24 +189,24 @@ func TestGetFirst(t *testing.T) {
 }
 func TestRemoveLast(t *testing.T) {
     // 正常情况
-    input1 := RString("Hello, World!")
+    input1 := S("Hello, World!")
     sep1 := ", "
-    expected1 := RString("Hello")
+    expected1 := S("Hello")
     output1 := input1.RemoveLast(sep1)
     if output1 != expected1 {
         t.Errorf("Expected %v but got %v", expected1, output1)
     }
     
-    input2 := RString("Hello, World!")
+    input2 := S("Hello, World!")
     sep2 := "!"
-    expected2 := RString("Hello, World")
+    expected2 := S("Hello, World")
     output2 := input2.RemoveLast(sep2)
     if output2 != expected2 {
         t.Errorf("Expected %v but got %v", expected2, output2)
     }
     
     // 边界情况
-    input3 := RString("Hello, World!")
+    input3 := S("Hello, World!")
     sep3 := ":"
     expected3 := input3
     output3 := input3.RemoveLast(sep3)
@@ -214,7 +214,7 @@ func TestRemoveLast(t *testing.T) {
         t.Errorf("Expected %v but got %v", expected3, output3)
     }
     
-    input4 := RString("")
+    input4 := S("")
     sep4 := ","
     expected4 := input4
     output4 := input4.RemoveLast(sep4)
@@ -222,18 +222,18 @@ func TestRemoveLast(t *testing.T) {
         t.Errorf("Expected %v but got %v", expected4, output4)
     }
     
-    input5 := RString("Hello, World!")
+    input5 := S("Hello, World!")
     sep5 := ","
-    expected5 := RString("Hello")
+    expected5 := S("Hello")
     output5 := input5.RemoveLast(sep5)
     if output5 != expected5 {
         t.Errorf("Expected %v but got %v", expected5, output5)
     }
     
     // 错误情况
-    input6 := RString("Hello, World!")
+    input6 := S("Hello, World!")
     sep6 := "W"
-    expected6 := RString("Hello, ")
+    expected6 := S("Hello, ")
     output6 := input6.RemoveLast(sep6)
     if output6 != expected6 {
         t.Errorf("Expected %v but got %v", expected6, output6)
@@ -241,23 +241,23 @@ func TestRemoveLast(t *testing.T) {
 }
 func TestGetLast(t *testing.T) {
     // 测试包含分隔符的情况
-    r := RString("apple,banana,cherry")
-    expected := RString("cherry")
+    r := S("apple,banana,cherry")
+    expected := S("cherry")
     result := r.GetLast(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
     }
     
     // 测试不包含分隔符的情况
-    r = RString("lemon")
-    expected = RString("lemon")
+    r = S("lemon")
+    expected = S("lemon")
     result = r.GetLast(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
     }
     // 
-    r = RString("lemon,")
-    expected = RString("")
+    r = S("lemon,")
+    expected = S("")
     result = r.GetLast(",")
     if result != expected {
         t.Errorf("Expected %s, got %s", expected, result)
@@ -269,27 +269,27 @@ func TestRString_RemoveFirst(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常情况",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"cd"},
-            RString("efg"),
+            S("efg"),
         },
         {
             "边界情况，开头就是分隔符",
-            RString("cdabc"),
+            S("cdabc"),
             args{"cd"},
-            RString("abc"),
+            S("abc"),
         },
         {
             "不存在分隔符的情况",
-            RString("abc"),
+            S("abc"),
             args{"cd"},
-            RString("abc"),
+            S("abc"),
         },
     }
     for _, tt := range tests {
@@ -308,27 +308,27 @@ func TestRString_GetSecond(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常情况有分隔符",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"cd"},
-            RString("efg"),
+            S("efg"),
         },
         {
             "边界情况开头就是分隔符",
-            RString("cdabc"),
+            S("cdabc"),
             args{"cd"},
-            RString("abc"),
+            S("abc"),
         },
         {
             "不存在分隔符",
-            RString("abc"),
+            S("abc"),
             args{"cd"},
-            RString("abc"),
+            S("abc"),
         },
     }
     for _, tt := range tests {
@@ -345,13 +345,13 @@ func TestRString_Base64DecodeAsBytes(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want []byte
     }{
         {
             "正常情况",
-            RString("SGVsbG8="), // 对应 "Hello" 的 base64 编码
+            S("SGVsbG8="), // 对应 "Hello" 的 base64 编码
             args{},
             []byte("Hello"),
         },
@@ -416,19 +416,19 @@ func TestRString_AsFloat(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want float64
     }{
         {
             "正常转换",
-            RString("123.45"),
+            S("123.45"),
             args{},
             123.45,
         },
         {
             "非数字字符串",
-            RString("abc"),
+            S("abc"),
             args{},
             0,
         },
@@ -447,19 +447,19 @@ func TestRString_AsInt(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want int
     }{
         {
             "正常转换数字",
-            RString("123"),
+            S("123"),
             args{},
             123,
         },
         {
             "非数字字符串",
-            RString("abc"),
+            S("abc"),
             args{},
             0,
         },
@@ -478,19 +478,19 @@ func TestRString_AsInt64(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want int64
     }{
         {
             "正常数字转换",
-            RString("123456"),
+            S("123456"),
             args{},
             123456,
         },
         {
             "非数字字符串",
-            RString("abc"),
+            S("abc"),
             args{},
             0,
         },
@@ -509,21 +509,21 @@ func TestRString_TrimSpace(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常去空格",
-            RString("  abc   "),
+            S("  abc   "),
             args{},
-            RString("abc"),
+            S("abc"),
         },
         {
             "本身无空格",
-            RString("abc"),
+            S("abc"),
             args{},
-            RString("abc"),
+            S("abc"),
         },
     }
     for _, tt := range tests {
@@ -543,13 +543,13 @@ func TestRString_JsonUnSerialize(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want error
     }{
         {
             "正常解析结构体",
-            RString(`{"name":"Alice","age":25}`),
+            S(`{"name":"Alice","age":25}`),
             args{&struct {
                 Name string
                 Age  int
@@ -558,7 +558,7 @@ func TestRString_JsonUnSerialize(t *testing.T) {
         },
         {
             "无效 JSON 字符串",
-            RString("invalid json"),
+            S("invalid json"),
             args{&struct{}{}},
             errors.New("invalid character 'i' looking for beginning of value"), // 根据实际错误情况填写
         },
@@ -579,49 +579,49 @@ func TestRString_AsBool(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want bool
     }{
         {
             "正常转换为 true - '1'",
-            RString("1"),
+            S("1"),
             args{},
             true,
         },
         {
             "正常转换为 true - 't'",
-            RString("t"),
+            S("t"),
             args{},
             true,
         },
         {
             "正常转换为 true - 'true'",
-            RString("true"),
+            S("true"),
             args{},
             true,
         },
         {
             "正常转换为 true - 'ok'",
-            RString("ok"),
+            S("ok"),
             args{},
             true,
         },
         {
             "正常转换为 true - 'yes'",
-            RString("yes"),
+            S("yes"),
             args{},
             true,
         },
         {
             "正常转换为 true -'sure'",
-            RString("sure"),
+            S("sure"),
             args{},
             true,
         },
         {
             "不转换为 true - 'abc'",
-            RString("abc"),
+            S("abc"),
             args{},
             false,
         },
@@ -640,21 +640,21 @@ func TestRString_Upper(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常转换为大写",
-            RString("abc"),
+            S("abc"),
             args{},
-            RString("ABC"),
+            S("ABC"),
         },
         {
             "本身就是大写",
-            RString("ABC"),
+            S("ABC"),
             args{},
-            RString("ABC"),
+            S("ABC"),
         },
     }
     for _, tt := range tests {
@@ -671,21 +671,21 @@ func TestRString_Lower(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常转换为小写",
-            RString("ABC"),
+            S("ABC"),
             args{},
-            RString("abc"),
+            S("abc"),
         },
         {
             "本身就是小写",
-            RString("abc"),
+            S("abc"),
             args{},
-            RString("abc"),
+            S("abc"),
         },
     }
     for _, tt := range tests {
@@ -704,21 +704,21 @@ func TestRString_TrimLeft(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常裁剪左边",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"abc"},
-            RString("defg"),
+            S("defg"),
         },
         {
             "裁剪部分不匹配",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"xyz"},
-            RString("abcdefg"),
+            S("abcdefg"),
         },
     }
     for _, tt := range tests {
@@ -737,27 +737,27 @@ func TestRString_TrimRight(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常裁剪右边",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"efg"},
-            RString("abcd"),
+            S("abcd"),
         },
         {
             "裁剪部分不匹配",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"xyz"},
-            RString("abcdefg"),
+            S("abcdefg"),
         },
         {
             "裁剪部分不匹配",
-            RString("abcdefg"),
+            S("abcdefg"),
             args{"cde"},
-            RString("abcdefg"),
+            S("abcdefg"),
         },
     }
     for _, tt := range tests {
@@ -775,19 +775,19 @@ func TestRString_AsUint64(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want uint64
     }{
         {
             "正常转换",
-            RString("123"),
+            S("123"),
             args{},
             123,
         },
         {
             "转换失败",
-            RString("abc"),
+            S("abc"),
             args{},
             0,
         },
@@ -806,31 +806,31 @@ func TestRString_SanitizeAsInt(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want int
     }{
         {
             "空字符串返回 0",
-            RString(""),
+            S(""),
             args{},
             0,
         },
         {
             "正常数字转换",
-            RString("1x2#3"),
+            S("1x2#3"),
             args{},
             123,
         },
         {
             "有非数字字符但能提取出数字",
-            RString("abc12_-3"),
+            S("abc12_-3"),
             args{},
             123,
         },
         {
             "带负号且转换正确",
-            RString("-123"),
+            S("-123"),
             args{},
             -123,
         },
@@ -849,31 +849,31 @@ func TestRString_SanitizeAsInt64(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want int64
     }{
         {
             "空字符串返回 0",
-            RString(""),
+            S(""),
             args{},
             0,
         },
         {
             "正常数字转换",
-            RString("1)23"),
+            S("1)23"),
             args{},
             123,
         },
         {
             "有非数字字符但能提取出数字",
-            RString("abc12#3"),
+            S("abc12#3"),
             args{},
             123,
         },
         {
             "带负号且转换正确",
-            RString("-12#3"),
+            S("-12#3"),
             args{},
             -123,
         },
@@ -894,21 +894,21 @@ func TestRString_Prepend(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常添加前缀",
-            RString("abc"),
+            S("abc"),
             args{"xyz"},
-            RString("xyzabc"),
+            S("xyzabc"),
         },
         {
             "空字符串添加前缀",
-            RString("def"),
+            S("def"),
             args{""},
-            RString("def"),
+            S("def"),
         },
     }
     for _, tt := range tests {
@@ -927,21 +927,21 @@ func TestRString_Append(t *testing.T) {
     }
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常添加后缀",
-            RString("abc"),
+            S("abc"),
             args{"xyz"},
-            RString("abcxyz"),
+            S("abcxyz"),
         },
         {
             "空字符串添加后缀",
-            RString("def"),
+            S("def"),
             args{""},
-            RString("def"),
+            S("def"),
         },
     }
     for _, tt := range tests {
@@ -958,37 +958,37 @@ func TestRString_SanitizeAsHostname(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
         want string
     }{
         {
             "正常有协议的 URL",
-            RString("https://example.com"),
+            S("https://example.com"),
             args{},
             "example.com",
         },
         {
             "无协议添加 http:// 后提取",
-            RString("example.com"),
+            S("example.com"),
             args{},
             "example.com",
         },
         {
             "无协议添加 http:// 后提取",
-            RString("127.0.0.1"),
+            S("127.0.0.1"),
             args{},
             "127.0.0.1",
         },
         {
             "无协议添加 http:// 后提取",
-            RString("127.0.0.1:222/wowig"),
+            S("127.0.0.1:222/wowig"),
             args{},
             "127.0.0.1",
         },
         {
             "无效 URL",
-            RString("invalid url"),
+            S("invalid url"),
             args{},
             "",
         },
@@ -1007,32 +1007,32 @@ func TestRString_SanitizeAsAlphabet(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常包含字母",
-            RString("abc123xyz"),
+            S("abc123xyz"),
             args{},
-            RString("abcxyz"),
+            S("abcxyz"),
         }, {
             "正常包含字母",
-            RString("ab c123x yz"),
+            S("ab c123x yz"),
             args{},
-            RString("ab cx yz"),
+            S("ab cx yz"),
         },
         {
             "全数字",
-            RString("123"),
+            S("123"),
             args{},
-            RString(""),
+            S(""),
         },
         {
             "空字符串",
-            RString(""),
+            S(""),
             args{},
-            RString(""),
+            S(""),
         },
     }
     for _, tt := range tests {
@@ -1049,27 +1049,27 @@ func TestRString_SanitizeAsAlphabetWithoutSpace(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常有字母和其他字符",
-            RString(" abc 123 xyz "),
+            S(" abc 123 xyz "),
             args{},
-            RString("abcxyz"),
+            S("abcxyz"),
         },
         {
             "全数字",
-            RString("123"),
+            S("123"),
             args{},
-            RString(""),
+            S(""),
         },
         {
             "空字符串",
-            RString(""),
+            S(""),
             args{},
-            RString(""),
+            S(""),
         },
     }
     for _, tt := range tests {
@@ -1086,33 +1086,33 @@ func TestRString_SanitizeAsAlphabetNumber(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "包含字母和数字",
-            RString("a#bc1#23xyz_"),
+            S("a#bc1#23xyz_"),
             args{},
-            RString("abc123xyz"),
+            S("abc123xyz"),
         },
         {
             "只有字母",
-            RString("abc#xyz#"),
+            S("abc#xyz#"),
             args{},
-            RString("abcxyz"),
+            S("abcxyz"),
         },
         {
             "只有数字",
-            RString("12#3"),
+            S("12#3"),
             args{},
-            RString("123"),
+            S("123"),
         },
         {
             "空字符串",
-            RString(""),
+            S(""),
             args{},
-            RString(""),
+            S(""),
         },
     }
     for _, tt := range tests {
@@ -1129,27 +1129,27 @@ func TestRString_SanitizeAsAlphabetNumberWithoutSpace(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "有字母、数字和空格",
-            RString("a b c# 1 2 3"),
+            S("a b c# 1 2 3"),
             args{},
-            RString("abc123"),
+            S("abc123"),
         },
         {
             "只有字母和数字",
-            RString("#abc#123 "),
+            S("#abc#123 "),
             args{},
-            RString("abc123"),
+            S("abc123"),
         },
         {
             "空字符串",
-            RString(""),
+            S(""),
             args{},
-            RString(""),
+            S(""),
         },
     }
     for _, tt := range tests {
@@ -1166,27 +1166,27 @@ func TestRString_StripHtml(t *testing.T) {
     type args struct{}
     tests := []struct {
         name string
-        r    RString
+        r    S
         args args
-        want RString
+        want S
     }{
         {
             "正常包含 html 标签",
-            RString("<<h1>Hello</h1> World"),
+            S("<<h1>Hello</h1> World"),
             args{},
-            RString("Hello World"),
+            S("Hello World"),
         },
         {
             "全是 html 标签",
-            RString("<html<body></body></html><script ss>"),
+            S("<html<body></body></html><script ss>"),
             args{},
-            RString(""),
+            S(""),
         },
         {
             "没有 html 标签",
-            RString("Just text"),
+            S("Just text"),
             args{},
-            RString("Just text"),
+            S("Just text"),
         },
     }
     for _, tt := range tests {

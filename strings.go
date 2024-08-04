@@ -14,51 +14,51 @@ var (
     JsonUnmarshalAdapter = json.Unmarshal
 )
 
-type RString string
+type S string
 
-func (r RString) String() string {
+func (r S) String() string {
     return string(r)
 }
-func (r RString) GetFirst(sep string) RString {
+func (r S) GetFirst(sep string) S {
     v := r.String()
     if !strings.Contains(v, sep) {
         return r
     }
-    return RString(strings.Split(v, sep)[0])
+    return S(strings.Split(v, sep)[0])
 }
-func (r RString) GetLast(sep string) RString {
-    v := r.String()
-    if !strings.Contains(v, sep) {
-        return r
-    }
-    split := strings.Split(v, sep)
-    return RString(split[len(split)-1])
-}
-func (r RString) RemoveLast(sep string) RString {
+func (r S) GetLast(sep string) S {
     v := r.String()
     if !strings.Contains(v, sep) {
         return r
     }
     split := strings.Split(v, sep)
-    return RString(strings.Join(split[:len(split)-1], sep))
+    return S(split[len(split)-1])
 }
-func (r RString) RemoveFirst(sep string) RString {
+func (r S) RemoveLast(sep string) S {
     v := r.String()
     if !strings.Contains(v, sep) {
         return r
     }
     split := strings.Split(v, sep)
-    return RString(strings.Join(split[1:], sep))
+    return S(strings.Join(split[:len(split)-1], sep))
 }
-func (r RString) GetSecond(sep string) RString {
+func (r S) RemoveFirst(sep string) S {
     v := r.String()
     if !strings.Contains(v, sep) {
         return r
     }
     split := strings.Split(v, sep)
-    return RString(split[1])
+    return S(strings.Join(split[1:], sep))
 }
-func (r RString) AsUrl(https ...bool) string {
+func (r S) GetSecond(sep string) S {
+    v := r.String()
+    if !strings.Contains(v, sep) {
+        return r
+    }
+    split := strings.Split(v, sep)
+    return S(split[1])
+}
+func (r S) AsUrl(https ...bool) string {
     if r == "" {
         return ""
     }
@@ -71,7 +71,7 @@ func (r RString) AsUrl(https ...bool) string {
     }
     return "http://" + v
 }
-func (r RString) IsUrl() bool {
+func (r S) IsUrl() bool {
     if r == "" {
         return false
     }
@@ -84,41 +84,41 @@ func (r RString) IsUrl() bool {
     }
     return true
 }
-func (r RString) UrlDecode() RString {
+func (r S) UrlDecode() S {
     if r == "" {
         return r
     }
     unescape, _ := url.QueryUnescape(r.String())
-    return RString(unescape)
+    return S(unescape)
 }
-func (r RString) AsString() string {
+func (r S) AsString() string {
     return string(r)
 }
-func (r RString) AsFloat() float64 {
+func (r S) AsFloat() float64 {
     parsed, _ := strconv.ParseFloat(r.AsString(), 64)
     return parsed
 }
-func (r RString) AsInt() int {
+func (r S) AsInt() int {
     atoi, _ := strconv.Atoi(string(r))
     return atoi
 }
-func (r RString) AsInt64() int64 {
+func (r S) AsInt64() int64 {
     atoi, _ := strconv.ParseInt(string(r), 10, 64)
     return atoi
 }
-func (r RString) TrimSpace() RString {
-    return RString(strings.TrimSpace(r.String()))
+func (r S) TrimSpace() S {
+    return S(strings.TrimSpace(r.String()))
 }
-func (r RString) TrimLeft(cut string) RString {
-    return RString(strings.TrimLeft(r.String(), cut))
+func (r S) TrimLeft(cut string) S {
+    return S(strings.TrimLeft(r.String(), cut))
 }
-func (r RString) Lower() RString {
-    return RString(strings.ToLower(r.String()))
+func (r S) Lower() S {
+    return S(strings.ToLower(r.String()))
 }
-func (r RString) Upper() RString {
-    return RString(strings.ToUpper(r.String()))
+func (r S) Upper() S {
+    return S(strings.ToUpper(r.String()))
 }
-func (r RString) AsBool() bool {
+func (r S) AsBool() bool {
     v := r.TrimSpace().Lower().String()
     switch v {
     case "1", "t", "true", "ok", "yes", "sure":
@@ -126,16 +126,16 @@ func (r RString) AsBool() bool {
     }
     return false
 }
-func (r RString) JsonUnmarshal(v interface{}) error {
+func (r S) JsonUnmarshal(v interface{}) error {
     return JsonUnmarshalAdapter([]byte(r), v)
 }
-func (r RString) JsonUnSerialize(v interface{}) error {
+func (r S) JsonUnSerialize(v interface{}) error {
     return r.JsonUnmarshal(v)
 }
-func (r RString) Base64Decode() RString {
-    return RString(r.Base64DecodeAsBytes())
+func (r S) Base64Decode() S {
+    return S(r.Base64DecodeAsBytes())
 }
-func (r RString) Base64DecodeAsBytes() []byte {
+func (r S) Base64DecodeAsBytes() []byte {
     decodeString, _ := base64.StdEncoding.DecodeString(r.String())
     return decodeString
 }
@@ -150,11 +150,11 @@ func JsonMarshalAsBytes(v interface{}) []byte {
     adapter, _ := JsonMarshalAdapter(v)
     return adapter
 }
-func (r RString) TrimRight(cut string) RString {
-    return RString(strings.TrimRight(r.String(), cut))
+func (r S) TrimRight(cut string) S {
+    return S(strings.TrimRight(r.String(), cut))
 }
 
-func (r RString) AsUint64() uint64 {
+func (r S) AsUint64() uint64 {
     if r == "" {
         return 0
     }
@@ -164,7 +164,7 @@ func (r RString) AsUint64() uint64 {
 
 var sanitizeIntCompile = regexp.MustCompile("[0-9]+")
 
-func (r RString) SanitizeAsInt() int {
+func (r S) SanitizeAsInt() int {
     if r == "" {
         return 0
     }
@@ -176,7 +176,7 @@ func (r RString) SanitizeAsInt() int {
     }
     return i
 }
-func (r RString) SanitizeAsInt64() int64 {
+func (r S) SanitizeAsInt64() int64 {
     if r == "" {
         return 0
     }
@@ -188,7 +188,7 @@ func (r RString) SanitizeAsInt64() int64 {
     }
     return i
 }
-func StringJoin(strs ...string) RString {
+func StringJoin(strs ...string) S {
     if len(strs) > 2 {
         var b strings.Builder
         var l int
@@ -199,17 +199,17 @@ func StringJoin(strs ...string) RString {
         for _, str := range strs {
             b.WriteString(str)
         }
-        return RString(b.String())
+        return S(b.String())
     }
-    return RString(strs[0] + strs[1])
+    return S(strs[0] + strs[1])
 }
-func (r RString) Prepend(s string) RString {
+func (r S) Prepend(s string) S {
     return StringJoin(s, r.String())
 }
-func (r RString) Append(s string) RString {
+func (r S) Append(s string) S {
     return StringJoin(r.String(), s)
 }
-func (r RString) SanitizeAsHostname() string {
+func (r S) SanitizeAsHostname() string {
     if r == "" {
         return ""
     }
@@ -223,49 +223,49 @@ func (r RString) SanitizeAsHostname() string {
 
 var sanitizeAlphabetCompile = regexp.MustCompile("([a-zA-Z ]+)")
 
-func (r RString) SanitizeAsAlphabet() RString {
+func (r S) SanitizeAsAlphabet() S {
     if r == "" {
         return r
     }
     match := sanitizeAlphabetCompile.FindAllString(r.String(), -1)
     s := strings.Join(match, "")
     // s = strings.Join(strings.Fields(s), " ")
-    return RString(s)
+    return S(s)
 }
 
 var sanitizeAlphabetSpaceCompile = regexp.MustCompile("([a-zA-Z]+)")
 
-func (r RString) SanitizeAsAlphabetWithoutSpace() RString {
+func (r S) SanitizeAsAlphabetWithoutSpace() S {
     if r == "" {
         return r
     }
     match := sanitizeAlphabetSpaceCompile.FindAllString(r.String(), -1)
     s := strings.Join(match, "")
-    return RString(s)
+    return S(s)
 }
 
 var sanitizeAlphabetNumberCompile = regexp.MustCompile("([a-zA-Z0-9 ]+)")
 
-func (r RString) SanitizeAsAlphabetNumber() RString {
+func (r S) SanitizeAsAlphabetNumber() S {
     if r == "" {
         return r
     }
     match := sanitizeAlphabetNumberCompile.FindAllString(r.String(), -1)
     s := strings.Join(match, "")
-    return RString(s)
+    return S(s)
 }
 
 var sanitizeAlphabetNumberSpaceCompile = regexp.MustCompile("([a-zA-Z0-9]+)")
 
-func (r RString) SanitizeAsAlphabetNumberWithoutSpace() RString {
+func (r S) SanitizeAsAlphabetNumberWithoutSpace() S {
     if r == "" {
         return r
     }
     match := sanitizeAlphabetNumberSpaceCompile.FindAllString(r.String(), -1)
     s := strings.Join(match, "")
-    return RString(s)
+    return S(s)
 }
-func (r RString) StripHtml() RString {
+func (r S) StripHtml() S {
     data := make([]rune, 0, len(r))
     inside := false
     for _, c := range r {
@@ -281,5 +281,5 @@ func (r RString) StripHtml() RString {
             data = append(data, c)
         }
     }
-    return RString(data)
+    return S(data)
 }
