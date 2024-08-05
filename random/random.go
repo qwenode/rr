@@ -2,6 +2,7 @@ package random
 
 import (
     crypto_rand "crypto/rand"
+    "encoding/binary"
     "fmt"
     "math/big"
     "math/rand"
@@ -9,15 +10,15 @@ import (
 )
 
 var (
-    Digits                string = "0123456789"                                                         // Digits: [0-9]
-    ASCIILettersLowercase string = "abcdefghijklmnopqrstuvwxyz"                                         // Asci Lowerrcase Letters: [a-z]
-    ASCIILettersUppercase string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"                                         // Ascii Uppercase Letters: [A-Z]
-    Letters               string = ASCIILettersLowercase + ASCIILettersUppercase                        // Ascii Letters: [a-zA-Z]
-    ASCIICharacters       string = ASCIILettersLowercase + ASCIILettersUppercase + Digits               // Ascii Charaters: [a-zA-Z0-9]
-    Hexdigits             string = "0123456789abcdefABCDEF"                                             // Hex Digits: [0-9a-fA-F]
-    Octdigits             string = "01234567"                                                           // Octal Digits: [0-7]
-    Punctuation           string = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"                                 // Punctuation and special characters
-    Printables            string = Digits + ASCIILettersLowercase + ASCIILettersUppercase + Punctuation // Printables
+    Digits                = "0123456789"                                                         // Digits: [0-9]
+    ASCIILettersLowercase = "abcdefghijklmnopqrstuvwxyz"                                         // Asci Lowerrcase Letters: [a-z]
+    ASCIILettersUppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"                                         // Ascii Uppercase Letters: [A-Z]
+    Letters               = ASCIILettersLowercase + ASCIILettersUppercase                        // Ascii Letters: [a-zA-Z]
+    ASCIICharacters       = ASCIILettersLowercase + ASCIILettersUppercase + Digits               // Ascii Charaters: [a-zA-Z0-9]
+    Hexdigits             = "0123456789abcdefABCDEF"                                             // Hex Digits: [0-9a-fA-F]
+    Octdigits             = "01234567"                                                           // Octal Digits: [0-7]
+    Punctuation           = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"                                 // Punctuation and special characters
+    Printables            = Digits + ASCIILettersLowercase + ASCIILettersUppercase + Punctuation // Printables
 )
 
 // GetInt generates a cryptographically-secure random Int.
@@ -34,23 +35,33 @@ func GetInt(max int) (int, error) {
     
     return n, err
 }
+func init() {
+    var rb [4]byte
+    _, err := crypto_rand.Read(rb[:])
+    seed := time.Now().UnixNano()
+    if err == nil {
+        seed += int64(binary.LittleEndian.Uint32(rb[:]))
+    }
+    // rand.Seed(seed)
+    insecureRand = rand.New(rand.NewSource(seed))
+}
 
+var insecureRand *rand.Rand
 // GetIntInsecure generate a random integer using a seed of current system time.
 func GetIntInsecure(i int) int {
-    var seededRand *rand.Rand = rand.New(rand.NewSource(time.Now().UnixNano()))
     
-    return seededRand.Intn(i)
+    return insecureRand.Intn(i)
 }
 
 // String generates a cryptographically secure string.
 func String(n int) (string, error) {
-    return Random(n, ASCIICharacters, true)
+    return Random(n, ASCIICharacters)
 }
 
 // String generates a cryptographically insecure string.
 // Use only when generating random data that does not require to be secure.
 func StringInsecure(n int) (string, error) {
-    return Random(n, ASCIICharacters, false)
+    return RandomInSecure(n, ASCIICharacters)
 }
 
 // StringRange generates a secure random string within the given range.
@@ -72,9 +83,7 @@ func IntRange(min int, max int) (int, error) {
     i += min
     return i, nil
 }
-
-// Random is responsible for generating Random data from a given character set.
-func Random(n int, charset string, isSecure bool) (string, error) {
+func Random(n int, charset string) (string, error) {
     var charsetByte = []byte(charset)
     
     s := make([]byte, n)
@@ -82,14 +91,30 @@ func Random(n int, charset string, isSecure bool) (string, error) {
     var mrange int
     var err error
     for i := range s {
-        if isSecure {
-            mrange, err = GetInt(len(charset))
-            if err != nil {
-                return "", fmt.Errorf("error getting safe int with crypto/rand")
-            }
-        } else {
-            mrange = GetIntInsecure(len(charset))
+        mrange, err = GetInt(len(charset))
+        if err != nil {
+            return "", fmt.Errorf("error getting safe int with crypto/rand")
         }
+        
+        s[i] = charsetByte[mrange]
+    }
+    
+    return string(s), nil
+}
+
+// Random is responsible for generating Random data from a given character set.
+func RandomInSecure(n int, charset string) (string, error) {
+    var charsetByte = []byte(charset)
+    
+    s := make([]byte, n)
+    
+    var mrange int
+    // var err error
+    for i := range s {
+        // mrange, err = GetInt(len(charset))
+        // if err != nil {
+            mrange = GetIntInsecure(len(charset))
+        // }
         
         s[i] = charsetByte[mrange]
     }

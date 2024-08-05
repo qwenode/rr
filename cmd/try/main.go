@@ -2,13 +2,13 @@ package main
 
 import (
     "log"
-    "rr"
+    "rr/random"
 )
 
 func main() {
-    t := rr.NewExceptionT("abc").WithT("abbb")
-    log.Println(t)
-    log.Println(t.StackMessages())
-    log.Println(t.Error())
-    log.Println(t.IsT("abbb"))
+    log.Println(random.String(10))
+    log.Println(random.StringRange(1, 10))
+    log.Println(random.Random(10, random.ASCIILettersLowercase))
+    log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
+    log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
 }
