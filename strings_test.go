@@ -7,6 +7,37 @@ import (
     "testing"
 )
 
+func TestS_Sha1(t *testing.T) {
+    type args struct{}
+    tests := []struct {
+        name string
+        r    S
+        args args
+        want string
+    }{
+        {
+            "正常字符串",
+            S("hello"),
+            args{},
+            "aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d",
+        },
+        {
+            "空字符串",
+            S(""),
+            args{},
+            "",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(
+            tt.name, func(t *testing.T) {
+                if got := tt.r.Sha1(); got != tt.want {
+                    t.Errorf("Sha1() = %s, want %s", got, tt.want)
+                }
+            },
+        )
+    }
+}
 func TestS_RemoveExtension(t *testing.T) {
     type args struct{}
     tests := []struct {

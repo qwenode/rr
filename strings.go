@@ -3,6 +3,7 @@ package rr
 import (
     "encoding/base64"
     "encoding/json"
+    "fmt"
     "net/url"
     "regexp"
     "strconv"
@@ -306,4 +307,35 @@ func (r S) AsF() F {
 }
 func (r S) RemoveExtension() S {
     return r.GetFirst(".")
+}
+
+func (r S) Sha1() string {
+    if r == "" {
+        return ""
+    }
+    return fmt.Sprintf("%x", B(r).Sha1())
+}
+func (r S) Sha256() string {
+    if r == "" {
+        return ""
+    }
+    return fmt.Sprintf("%x", B(r).Sha256())
+}
+func (r S) Sha512() string {
+    if r == "" {
+        return ""
+    }
+    return fmt.Sprintf("%x", B(r).Sha512())
+}
+func (r S) Md5() string {
+    if r == "" {
+        return ""
+    }
+    return fmt.Sprintf("%x", B(r).Md5())
+}
+func (r S) Crc32() string {
+    if r == "" {
+        return ""
+    }
+    return B(r).Crc32()
 }
