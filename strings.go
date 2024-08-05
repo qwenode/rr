@@ -2,7 +2,6 @@ package rr
 
 import (
     "encoding/base64"
-    "encoding/json"
     "fmt"
     "net/url"
     "regexp"
@@ -11,10 +10,6 @@ import (
     "sync"
 )
 
-var (
-    JsonMarshalAdapter   = json.Marshal
-    JsonUnmarshalAdapter = json.Unmarshal
-)
 
 type S string
 
@@ -145,22 +140,6 @@ func (r S) Base64DecodeAsBytes() []byte {
     return decodeString
 }
 
-func JsonUnSerialize(d []byte, v interface{}) error {
-    return JsonUnmarshal(d, v)
-}
-func JsonUnmarshal(d []byte, v interface{}) error {
-    return JsonUnmarshalAdapter(d, v)
-}
-func JsonSerialize(v interface{}) string {
-    return JsonMarshal(v)
-}
-func JsonMarshal(v interface{}) string {
-    return string(JsonMarshalAsBytes(v))
-}
-func JsonMarshalAsBytes(v interface{}) []byte {
-    adapter, _ := JsonMarshalAdapter(v)
-    return adapter
-}
 func (r S) TrimRight(cut string) S {
     return S(strings.TrimRight(r.String(), cut))
 }

@@ -1,10 +1,14 @@
 package main
 
 import (
-    "errors"
+    "log"
+    "rr"
 )
 
 func main() {
-    errors.New()
-    errors.Is()
+    t := rr.NewExceptionT("abc").WithT("abbb")
+    log.Println(t)
+    log.Println(t.StackMessages())
+    log.Println(t.Error())
+    log.Println(t.IsT("abbb"))
 }

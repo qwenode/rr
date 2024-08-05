@@ -11,16 +11,18 @@ var (
     ErrExceptionNotFound        = NewExceptionT("Not found")
     ErrExceptionServer          = NewExceptionT("Server error")
     ErrExceptionTimeout         = NewExceptionT("Timeout")
-    ErrExceptionBadRequest      = NewExceptionT("Bad request")
     ErrExceptionUnauthorized    = NewExceptionT("Unauthorized")
     ErrExceptionForbidden       = NewExceptionT("Forbidden")
     ErrExceptionTooManyRequests = NewExceptionT("Too many requests")
+    ErrExceptionInvalidArgs = NewExceptionT("Invalid arguments")
 )
 
+//  异常错误处理
 type Exception interface {
     Error() string
     Is(v error) bool
     IsT(v string) bool
+    IsE(exception Exception) bool
     With(v error) Exception
     WithT(v string) Exception
     WithException(v Exception) Exception
@@ -36,7 +38,12 @@ type exceptionStack struct {
 func (r *exceptionStack) Error() string {
     return r.text
 }
-
+func (r exceptionStack) IsE(exception Exception) bool {
+    if exception == nil {
+        return false
+    }
+    return r.IsT(exception.Error())
+}
 func (r *exceptionStack) IsT(v string) bool {
     if v == "" {
         return false
@@ -44,8 +51,8 @@ func (r *exceptionStack) IsT(v string) bool {
     if v == r.text {
         return true
     }
-    for _, err := range r.with {
-        if err == r.text {
+    for _, s := range r.with {
+        if s == v {
             return true
         }
     }
@@ -55,25 +62,20 @@ func (r *exceptionStack) Is(v error) bool {
     if v == nil {
         return false
     }
-    s := v.Error()
-    if s == r.text {
-        return true
-    }
-    for _, err := range r.with {
-        if err == s {
-            return true
-        }
-    }
-    return false
+    return r.IsT(v.Error())
 }
 func (r *exceptionStack) StackMessages() string {
     var sb strings.Builder
     sb.Grow(r.length)
     sb.WriteString(r.text)
-    sb.WriteString("\n")
+    
     for _, s := range r.with {
-        sb.WriteString(s)
+        if s == "" {
+            continue
+        }
         sb.WriteString("\n")
+        sb.WriteString(s)
+        
     }
     return sb.String()
 }
@@ -95,13 +97,26 @@ func (r *exceptionStack) With(v error) Exception {
     return r.WithT(v.Error())
 }
 
-func NewException(e error) Exception {
+func NewException(e error, with ...Exception) Exception {
     var v string
     if e != nil {
         v = e.Error()
     }
-    return NewExceptionT(v)
+    
+    t := NewExceptionT(v)
+    if len(with) > 0 {
+        for _, exception := range with {
+            t.WithException(exception)
+        }
+    }
+    return t
 }
-func NewExceptionT(v string) Exception {
-    return &exceptionStack{text: v, with: make([]string, 0, ExceptionMaxStack), index: 0, length: len(v)}
+func NewExceptionT(v string, with ...Exception) Exception {
+    t := &exceptionStack{text: v, with: make([]string, ExceptionMaxStack), index: 0, length: len(v)}
+    if len(with) > 0 {
+        for _, exception := range with {
+            t.WithException(exception)
+        }
+    }
+    return t
 }
