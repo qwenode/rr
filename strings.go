@@ -145,6 +145,12 @@ func (r S) Base64DecodeAsBytes() []byte {
     return decodeString
 }
 
+func JsonUnSerialize(d []byte, v interface{}) error {
+    return JsonUnmarshal(d, v)
+}
+func JsonUnmarshal(d []byte, v interface{}) error {
+    return JsonUnmarshalAdapter(d, v)
+}
 func JsonSerialize(v interface{}) string {
     return JsonMarshal(v)
 }
@@ -490,4 +496,8 @@ func (r S) ToCamel() string {
 // ToLowerCamel converts a string to lowerCamelCase
 func (r S) ToLowerCamel() string {
     return r.toCamelInitCase(false)
+}
+
+func (r S) Contains(v string) bool {
+    return strings.Contains(r.String(), v)
 }
