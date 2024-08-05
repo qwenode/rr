@@ -19,6 +19,9 @@ type S string
 func (r S) String() string {
     return string(r)
 }
+func (r S) Bytes() []byte {
+    return []byte(r)
+}
 func (r S) GetFirst(sep string) S {
     v := r.String()
     if !strings.Contains(v, sep) {
@@ -282,4 +285,25 @@ func (r S) StripHtml() S {
         }
     }
     return S(data)
+}
+func (r S) AsLines() []string {
+    if r == "" {
+        return make([]string, 0)
+    }
+    return strings.Split(r.String(), "\n")
+}
+
+func (r S) GetExtension() S {
+    s := r.String()
+    if !strings.Contains(s, ".") {
+        return ""
+    }
+    
+    return r.GetLast(".").GetFirst("/").GetFirst("#").GetFirst("?")
+}
+func (r S) AsF() F {
+    return F(r)
+}
+func (r S) RemoveExtension() S {
+    return r.GetFirst(".")
 }

@@ -3,9 +3,80 @@ package rr
 import (
     "bytes"
     "errors"
+    "reflect"
     "testing"
 )
 
+func TestS_RemoveExtension(t *testing.T) {
+    type args struct{}
+    tests := []struct {
+        name string
+        r    S
+        args args
+        want S
+    }{
+        {
+            "有扩展名",
+            S("file.txt"),
+            args{},
+            S("file"),
+        },
+        {
+            "没有扩展名",
+            S("file"),
+            args{},
+            S("file"),
+        },
+        {
+            "空字符串",
+            S(""),
+            args{},
+            S(""),
+        },
+    }
+    for _, tt := range tests {
+        t.Run(
+            tt.name, func(t *testing.T) {
+                if got := tt.r.RemoveExtension(); got != tt.want {
+                    t.Errorf("RemoveExtension() = %v, want %v", got, tt.want)
+                }
+            },
+        )
+    }
+}
+func TestS_AsLines(t *testing.T) {
+    type args struct {
+        s S
+    }
+    tests := []struct {
+        name string
+        r    S
+        args args
+        want []string
+    }{
+        {
+            "正常情况",
+            S("line1\nline2\nline3"),
+            args{S("line1\nline2\nline3")},
+            []string{"line1", "line2", "line3"},
+        },
+        {
+            "空字符串",
+            S(""),
+            args{S("")},
+            []string{},
+        },
+    }
+    for _, tt := range tests {
+        t.Run(
+            tt.name, func(t *testing.T) {
+                if got := tt.r.AsLines(); !reflect.DeepEqual(got, tt.want) {
+                    t.Errorf("AsLines() = %v, want %v", got, tt.want)
+                }
+            },
+        )
+    }
+}
 func TestRString_JsonUnmarshal(t *testing.T) {
     type args struct {
         v interface{}
