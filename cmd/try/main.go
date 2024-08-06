@@ -11,4 +11,7 @@ func main() {
     log.Println(random.Random(10, random.ASCIILettersLowercase))
     log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
     log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
+    log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
+    log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
+    log.Println(random.RandomInSecure(10, random.ASCIILettersLowercase))
 }

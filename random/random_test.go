@@ -34,7 +34,7 @@ func TestGetInt(t *testing.T) {
 
 func TestRandom(t *testing.T) {
     for i := 0; i < 1000; i++ {
-        _, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", true)
+        _, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
         if err != nil {
             t.Error(err)
         }
@@ -44,7 +44,7 @@ func TestRandom(t *testing.T) {
 func TestChoice(t *testing.T) {
     s := []string{}
     for i := 0; i < 1000; i++ {
-        random_string, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", true)
+        random_string, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
         if err != nil {
             t.Error(err)
             return
