@@ -6,49 +6,37 @@ import (
 
 func TestString(t *testing.T) {
     for i := 0; i < 1000; i++ {
-        _, err := String(100)
-        if err != nil {
-            t.Error(err)
-            return
-        }
+        _ = String(100)
+        
     }
 }
 
 func TestIntRange(t *testing.T) {
     for i := 0; i < 1000; i++ {
-        _, err := IntRange(1, 1000)
-        if err != nil {
-            t.Error(err)
-        }
+        _ = IntRange(1, 1000)
+        
     }
 }
 
 func TestGetInt(t *testing.T) {
     for i := 1; i < 1000; i++ {
-        _, err := GetInt(i * 1000)
-        if err != nil {
-            t.Error(err)
-        }
+        _ = getInt(i * 1000)
+        
     }
 }
 
 func TestRandom(t *testing.T) {
     for i := 0; i < 1000; i++ {
-        _, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-        if err != nil {
-            t.Error(err)
-        }
+        _ = Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        
     }
 }
 
 func TestChoice(t *testing.T) {
     s := []string{}
     for i := 0; i < 1000; i++ {
-        random_string, err := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-        if err != nil {
-            t.Error(err)
-            return
-        }
+        random_string := Random(i, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        
         s = append(s, random_string)
     }
     for i := 0; i < 1000; i++ {
@@ -59,11 +47,8 @@ func TestChoice(t *testing.T) {
 
 func TestStringRange(t *testing.T) {
     for i := 0; i < 200; i++ {
-        _, err := StringRange(20, 80)
-        if err != nil {
-            t.Error(err)
-            return
-        }
+        _ = StringRange(20, 80)
+        
     }
 }
 

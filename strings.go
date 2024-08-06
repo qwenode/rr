@@ -58,6 +58,10 @@ func (r S) GetSecond(sep string) S {
     split := strings.Split(v, sep)
     return S(split[1])
 }
+
+func (r S) Len() int {
+    return len(r)
+}
 func (r S) AsUrl(https ...bool) string {
     if r == "" {
         return ""
@@ -125,6 +129,9 @@ func (r S) AsBool() bool {
         return true
     }
     return false
+}
+func (r S) SanitizeAsBool() bool {
+    return r.AsBool()
 }
 func (r S) JsonUnmarshal(v interface{}) error {
     return JsonUnmarshalAdapter([]byte(r), v)
