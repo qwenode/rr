@@ -24,6 +24,8 @@ func ToTimeInDefaultLocationE(i interface{}, location *time.Location) (tim time.
     switch v := i.(type) {
     case time.Time:
         return v, nil
+    case S:
+        return StringToDateInDefaultLocation(v.String(), location)
     case string:
         return StringToDateInDefaultLocation(v, location)
     case json.Number:
@@ -61,6 +63,13 @@ func ToDurationE(i interface{}) (d time.Duration, err error) {
         return
     case float32, float64:
         d = time.Duration(ToFloat64(s))
+        return
+    case S:
+        if strings.ContainsAny(s.String(), "nsuµmh") {
+            d, err = time.ParseDuration(s.String())
+        } else {
+            d, err = time.ParseDuration(s.String() + "ns")
+        }
         return
     case string:
         if strings.ContainsAny(s, "nsuµmh") {
@@ -115,6 +124,8 @@ func ToBoolE(i interface{}) (bool, error) {
         return b != 0, nil
     case time.Duration:
         return b != 0, nil
+    case S:
+        return strconv.ParseBool(i.(S).String())
     case string:
         return strconv.ParseBool(i.(string))
     case json.Number:
@@ -160,6 +171,12 @@ func ToFloat64E(i interface{}) (float64, error) {
         return float64(s), nil
     case uint8:
         return float64(s), nil
+    case S:
+        v, err := strconv.ParseFloat(s.String(), 64)
+        if err == nil {
+            return v, nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
     case string:
         v, err := strconv.ParseFloat(s, 64)
         if err == nil {
@@ -216,6 +233,12 @@ func ToFloat32E(i interface{}) (float32, error) {
         return float32(s), nil
     case uint8:
         return float32(s), nil
+    case S:
+        v, err := strconv.ParseFloat(s.String(), 32)
+        if err == nil {
+            return float32(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
     case string:
         v, err := strconv.ParseFloat(s, 32)
         if err == nil {
@@ -272,6 +295,12 @@ func ToInt64E(i interface{}) (int64, error) {
         return int64(s), nil
     case float32:
         return int64(s), nil
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            return v, nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -324,6 +353,12 @@ func ToInt32E(i interface{}) (int32, error) {
         return int32(s), nil
     case float32:
         return int32(s), nil
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            return int32(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to int32", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -376,6 +411,12 @@ func ToInt16E(i interface{}) (int16, error) {
         return int16(s), nil
     case float32:
         return int16(s), nil
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            return int16(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to int16", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -428,6 +469,12 @@ func ToInt8E(i interface{}) (int8, error) {
         return int8(s), nil
     case float32:
         return int8(s), nil
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            return int8(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to int8", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -480,6 +527,12 @@ func ToIntE(i interface{}) (int, error) {
         return int(s), nil
     case float32:
         return int(s), nil
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            return int(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -513,6 +566,15 @@ func ToUintE(i interface{}) (uint, error) {
     }
     
     switch s := i.(type) {
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            if v < 0 {
+                return 0, errNegativeNotAllowed
+            }
+            return uint(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to uint", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -589,6 +651,15 @@ func ToUint64E(i interface{}) (uint64, error) {
     }
     
     switch s := i.(type) {
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            if v < 0 {
+                return 0, errNegativeNotAllowed
+            }
+            return uint64(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to uint64", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -665,6 +736,15 @@ func ToUint32E(i interface{}) (uint32, error) {
     }
     
     switch s := i.(type) {
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            if v < 0 {
+                return 0, errNegativeNotAllowed
+            }
+            return uint32(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to uint32", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -741,6 +821,15 @@ func ToUint16E(i interface{}) (uint16, error) {
     }
     
     switch s := i.(type) {
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            if v < 0 {
+                return 0, errNegativeNotAllowed
+            }
+            return uint16(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to uint16", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -817,6 +906,15 @@ func ToUint8E(i interface{}) (uint8, error) {
     }
     
     switch s := i.(type) {
+    case S:
+        v, err := strconv.ParseInt(trimZeroDecimal(s.String()), 0, 0)
+        if err == nil {
+            if v < 0 {
+                return 0, errNegativeNotAllowed
+            }
+            return uint8(v), nil
+        }
+        return 0, fmt.Errorf("unable to cast %#v of type %T to uint8", i, i)
     case string:
         v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
         if err == nil {
@@ -924,6 +1022,8 @@ func ToStringE(i interface{}) (string, error) {
     i = indirectToStringerOrError(i)
     
     switch s := i.(type) {
+    case S:
+        return s.String(), nil
     case string:
         return s, nil
     case bool:
@@ -999,6 +1099,9 @@ func ToStringMapStringE(i interface{}) (map[string]string, error) {
             m[ToString(k)] = ToString(val)
         }
         return m, nil
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1062,6 +1165,9 @@ func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
             }
             m[key] = value
         }
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1088,6 +1194,9 @@ func ToStringMapBoolE(i interface{}) (map[string]bool, error) {
         return m, nil
     case map[string]bool:
         return v, nil
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1108,6 +1217,9 @@ func ToStringMapE(i interface{}) (map[string]interface{}, error) {
         return m, nil
     case map[string]interface{}:
         return v, nil
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1136,6 +1248,9 @@ func ToStringMapIntE(i interface{}) (map[string]int, error) {
         return m, nil
     case map[string]int:
         return v, nil
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1177,6 +1292,9 @@ func ToStringMapInt64E(i interface{}) (map[string]int64, error) {
         return m, nil
     case map[string]int64:
         return v, nil
+    case S:
+        err := jsonStringToObject(v.String(), &m)
+        return m, err
     case string:
         err := jsonStringToObject(v, &m)
         return m, err
@@ -1285,6 +1403,8 @@ func ToStringSliceE(i interface{}) ([]string, error) {
             a = append(a, ToString(u))
         }
         return a, nil
+    case S:
+        return strings.Fields(v.String()), nil
     case string:
         return strings.Fields(v), nil
     case []error:
