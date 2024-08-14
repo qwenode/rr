@@ -333,6 +333,9 @@ func (r S) Crc32() string {
     return B(r).Crc32()
 }
 func (r S) Substr(start, length int) S {
+    if r == "" {
+        return r
+    }
     if length < 0 {
         length = 0
     }
