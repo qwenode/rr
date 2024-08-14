@@ -220,3 +220,7 @@ func (r F) MoveFile(dst string) error {
     }
     return os.Remove(r.String())
 }
+
+func (r F) WithWorkDirectory() F {
+    return F(filepath.Join(WorkDirectory, r.String()))
+}
