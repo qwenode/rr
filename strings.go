@@ -332,7 +332,29 @@ func (r S) Crc32() string {
     }
     return B(r).Crc32()
 }
-
+func (r S) Substr(start, length int) S {
+    if length < 0 {
+        length = 0
+    }
+    s := []rune(r.String())
+    sLen := len(s)
+    begin := start
+    if start < 0 {
+        begin = sLen + start
+    }
+    if begin < 0 {
+        begin = 0
+    }
+    
+    end := begin + length
+    if end > sLen {
+        end = sLen
+    }
+    if begin == 0 && end == sLen {
+        return r
+    }
+    return S(s[begin:end])
+}
 // ToSnake converts a string to snake_case
 func (r S) ToSnake() string {
     return r.ToDelimited('_')
