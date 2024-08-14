@@ -19,6 +19,9 @@ var (
 
 type F string
 
+func NewF(v string) F {
+    return F(v)
+}
 func (r F) String() string {
     return string(r)
 }

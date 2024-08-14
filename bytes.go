@@ -11,6 +11,9 @@ import (
 
 type B []byte
 
+func NewB(v []byte) B {
+    return B(v)
+}
 func (r B) AsS() S {
     return S(r)
 }

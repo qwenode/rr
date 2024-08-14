@@ -13,6 +13,9 @@ import (
 
 type S string
 
+func NewS(v string) S {
+    return S(v)
+}
 func (r S) String() string {
     return string(r)
 }
