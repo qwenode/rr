@@ -10,7 +10,6 @@ import (
     "sync"
 )
 
-
 type S string
 
 func NewS(v string) S {
@@ -221,6 +220,18 @@ func (r S) SanitizeAsHostname() string {
     return parse.Hostname()
 }
 
+var sanitizeANDS = regexp.MustCompile("[a-zA-Z0-9_-]+")
+
+func (r S) SanitizeAsAlphabetNumberDashUnderline() S {
+    if r == "" {
+        return r
+    }
+    match := sanitizeANDS.FindAllString(r.String(), -1)
+    s := strings.Join(match, "")
+    // s = strings.Join(strings.Fields(s), " ")
+    return S(s)
+}
+
 var sanitizeAlphabetCompile = regexp.MustCompile("([a-zA-Z ]+)")
 
 func (r S) SanitizeAsAlphabet() S {
@@ -364,6 +375,7 @@ func (r S) Substr(start, length int) S {
     }
     return S(s[begin:end])
 }
+
 // ToSnake converts a string to snake_case
 func (r S) ToSnake() string {
     return r.ToDelimited('_')

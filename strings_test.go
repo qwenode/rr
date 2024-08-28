@@ -1686,3 +1686,29 @@ func benchmarkCamelTest(b *testing.B, fn func(testing.TB)) {
         fn(b)
     }
 }
+
+func TestS_SanitizeAsAlphabetNumberDashUnderline(t *testing.T) {
+    tests := []struct {
+        name string
+        r    S
+        want S
+    }{
+        {
+            r:    NewS("abbw-_fwg#$o-"),
+            want: NewS("abbw-_fwgo-"),
+        },
+        {
+            r:    NewS("abbw-_f21Gwg#$o-"),
+            want: NewS("abbw-_f21Gwgo-"),
+        },
+    }
+    for _, tt := range tests {
+        t.Run(
+            tt.name, func(t *testing.T) {
+                if got := tt.r.SanitizeAsAlphabetNumberDashUnderline(); got != tt.want {
+                    t.Errorf("SanitizeAsAlphabetNumberDashUnderline() = %v, want %v", got, tt.want)
+                }
+            },
+        )
+    }
+}
