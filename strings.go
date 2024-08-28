@@ -375,6 +375,10 @@ func (r S) Substr(start, length int) S {
     }
     return S(s[begin:end])
 }
+func (r S) LenBetween(start, end int) bool {
+    i := len(r)
+    return i >= start && i < end
+}
 
 // ToSnake converts a string to snake_case
 func (r S) ToSnake() string {
