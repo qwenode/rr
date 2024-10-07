@@ -2,6 +2,9 @@ package rr
 
 import "time"
 
+func Try(callable func() error, callables ...func() error) error {
+    return Catch(callable, callables...)
+}
 func TryCatch(callable func() error, callables ...func() error) error {
     return Catch(callable, callables...)
 }
