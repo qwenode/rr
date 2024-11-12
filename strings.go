@@ -60,7 +60,9 @@ func (r S) GetSecond(sep string) S {
     split := strings.Split(v, sep)
     return S(split[1])
 }
-
+func (r S) IsEmpty() bool {
+    return r == ""
+}
 func (r S) Len() int {
     return len(r)
 }
