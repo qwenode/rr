@@ -1073,3 +1073,28 @@ func (r S) SanitizeAsNumberWithoutSpace() S {
     s := strings.Join(match, "")
     return S(s)
 }
+
+func (r S) SanitizeAsInt() int {
+    if r == "" {
+        return 0
+    }
+    v := r.String()
+    match := sanitizeIntCompile.FindAllString(v, -1)
+    i, _ := strconv.Atoi(strings.Join(match, ""))
+    if strings.Index(v, "-") == 0 && i > 0 {
+        i *= -1
+    }
+    return i
+}
+func (r S) SanitizeAsInt64() int64 {
+    if r == "" {
+        return 0
+    }
+    v := r.String()
+    match := sanitizeIntCompile.FindAllString(v, -1)
+    i, _ := strconv.ParseInt(strings.Join(match, ""), 10, 64)
+    if strings.Index(v, "-") == 0 && i > 0 {
+        i *= -1
+    }
+    return i
+}

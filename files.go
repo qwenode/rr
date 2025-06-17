@@ -224,3 +224,10 @@ func (r F) MoveFile(dst string) error {
 func (r F) WithWorkDirectory() F {
     return F(filepath.Join(WorkDirectory, r.String()))
 }
+
+func (r F) Open() (*os.File, error) {
+    return os.Open(r.String())
+}
+func (r F) OpenFile(flag int, perm os.FileMode) (*os.File, error) {
+    return os.OpenFile(r.String(), flag, perm)
+}
