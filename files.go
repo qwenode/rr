@@ -66,7 +66,7 @@ func (r F) AppendContentsAsByte(v []byte) error {
     if err1 := f.Close(); err1 == nil {
         err = err1
     }
-    
+
     return err
 }
 func (r F) AppendContents(v string) error {
@@ -84,7 +84,7 @@ func (r F) PutContentsAsByte(v []byte) error {
     if err1 := f.Close(); err1 == nil {
         err = err1
     }
-    
+
     return err
 }
 func (r F) PutContents(v string) error {
@@ -92,7 +92,7 @@ func (r F) PutContents(v string) error {
 }
 func (r F) Exist() bool {
     _, err := os.Stat(r.String())
-    
+
     if err != nil {
         if os.IsNotExist(err) {
             return false

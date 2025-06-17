@@ -1062,3 +1062,14 @@ func (r S) ToLowerCamel() string {
 func (r S) Contains(v string) bool {
     return strings.Contains(r.String(), v)
 }
+
+var sanitizeNumberSpaceCompile = regexp.MustCompile("([0-9]+)")
+
+func (r S) SanitizeAsNumberWithoutSpace() S {
+    if r == "" {
+        return r
+    }
+    match := sanitizeNumberSpaceCompile.FindAllString(r.String(), -1)
+    s := strings.Join(match, "")
+    return S(s)
+}
