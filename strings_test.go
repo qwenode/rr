@@ -1792,3 +1792,122 @@ func TestStringGetFirst(t *testing.T) {
 		})
 	}
 }
+
+func TestStringSanitizeAsInt(t *testing.T) {
+	type args struct {
+		s string
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			"空字符串返回0",
+			args{""},
+			0,
+		},
+		{
+			"纯数字字符串",
+			args{"123"},
+			123,
+		},
+		{
+			"混合字符字符串",
+			args{"abc123def"},
+			123,
+		},
+		{
+			"只有非数字字符",
+			args{"abc"},
+			0,
+		},
+		{
+			"以负号开头的数字",
+			args{"-123"},
+			-123,
+		},
+		{
+			"负号在中间",
+			args{"12-34"},
+			1234,
+		},
+		{
+			"负号在结尾",
+			args{"123-"},
+			123,
+		},
+		{
+			"多个负号",
+			args{"-12-34"},
+			-1234,
+		},
+		{
+			"数字分散在字符串各处",
+			args{"a1b2c3"},
+			123,
+		},
+		{
+			"包含空格和制表符",
+			args{" 123\t456 "},
+			123456,
+		},
+		{
+			"包含标点符号",
+			args{"1,234.56"},
+			123456,
+		},
+		{
+			"包含中文字符",
+			args{"数字123测试"},
+			123,
+		},
+		{
+			"包含特殊字符",
+			args{"1@2#3$4"},
+			1234,
+		},
+		{
+			"零值处理",
+			args{"0"},
+			0,
+		},
+		{
+			"极大数字",
+			args{"999999999"},
+			999999999,
+		},
+		{
+			"极小数字",
+			args{"-999999999"},
+			-999999999,
+		},
+		{
+			"连续数字",
+			args{"123456789"},
+			123456789,
+		},
+		{
+			"数字间有少量非数字字符",
+			args{"1a2b3"},
+			123,
+		},
+		{
+			"只有负号",
+			args{"-"},
+			0,
+		},
+		{
+			"负号后无数字",
+			args{"-abc"},
+			0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := StringSanitizeAsInt(tt.args.s); got != tt.want {
+				t.Errorf("StringSanitizeAsInt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
