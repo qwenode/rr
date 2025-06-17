@@ -39,3 +39,11 @@ func (r B) Crc32() string {
 func (r B) Md5() [16]byte {
     return md5.Sum(r)
 }
+
+func (r B) Sha1String() string {
+    return fmt.Sprintf("%x", r.Sha1())
+}
+
+func (r B) Md5String() string {
+    return fmt.Sprintf("%x", r.Md5())
+}
