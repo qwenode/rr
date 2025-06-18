@@ -2225,3 +2225,70 @@ func TestStringRemoveFirst(t *testing.T) {
         })
     }
 }
+
+func TestStringIsUrl(t *testing.T) {
+    tests := []struct {
+        name string
+        url  string
+        want bool
+    }{
+        {
+            name: "空字符串",
+            url:  "",
+            want: false,
+        },
+        {
+            name: "无效URL格式",
+            url:  "invalid-url",
+            want: false,
+        },
+        {
+            name: "缺少scheme",
+            url:  "www.example.com",
+            want: false,
+        },
+        {
+            name: "缺少host",
+            url:  "http:///path",
+            want: false,
+        },
+        {
+            name: "有效HTTP URL",
+            url:  "http://example.com",
+            want: true,
+        },
+        {
+            name: "有效HTTPS URL带路径",
+            url:  "https://example.com/path",
+            want: true,
+        },
+        {
+            name: "有效URL带查询参数",
+            url:  "https://example.com/path?key=value",
+            want: true,
+        },
+        {
+            name: "有效URL带端口",
+            url:  "http://example.com:8080",
+            want: true,
+        },
+        {
+            name: "有效URL带认证信息",
+            url:  "http://user:pass@example.com",
+            want: true,
+        },
+        {
+            name: "有效URL带片段",
+            url:  "http://example.com/path#fragment",
+            want: true,
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringIsUrl(tt.url); got != tt.want {
+                t.Errorf("StringIsUrl() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
