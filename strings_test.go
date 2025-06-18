@@ -1911,3 +1911,79 @@ func TestStringSanitizeAsInt(t *testing.T) {
 		})
 	}
 }
+
+func TestStringRemoveLast(t *testing.T) {
+    type args struct {
+        s   string
+        sep string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        {
+            name: "正常情况：移除最后一段",
+            args: args{
+                s:   "a/b/c",
+                sep: "/",
+            },
+            want: "a/b",
+        },
+        {
+            name: "边界情况：空分隔符",
+            args: args{
+                s:   "abc",
+                sep: "",
+            },
+            want: "abc",
+        },
+        {
+            name: "边界情况：空字符串",
+            args: args{
+                s:   "",
+                sep: "/",
+            },
+            want: "",
+        },
+        {
+            name: "边界情况：分隔符不存在",
+            args: args{
+                s:   "abc",
+                sep: "/",
+            },
+            want: "abc",
+        },
+        {
+            name: "特殊情况：连续分隔符",
+            args: args{
+                s:   "a//b//c",
+                sep: "//",
+            },
+            want: "a//b",
+        },
+        {
+            name: "特殊情况：分隔符在末尾",
+            args: args{
+                s:   "a/b/",
+                sep: "/",
+            },
+            want: "a/b",
+        },
+        {
+            name: "特殊情况：多字符分隔符",
+            args: args{
+                s:   "axxxbxxxc",
+                sep: "xxx",
+            },
+            want: "axxxb",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringRemoveLast(tt.args.s, tt.args.sep); got != tt.want {
+                t.Errorf("StringRemoveLast() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
