@@ -1714,202 +1714,202 @@ func TestS_SanitizeAsAlphabetNumberDashUnderline(t *testing.T) {
 }
 
 func TestStringGetFirst(t *testing.T) {
-	type args struct {
-		s   string
-		sep string
-	}
-	tests := []struct {
-		name string
-		args args
-		want string
-	}{
-		{
-			"正常情况包含分隔符",
-			args{"apple,banana,cherry", ","},
-			"apple",
-		},
-		{
-			"不包含分隔符",
-			args{"orange", ","},
-			"orange",
-		},
-		{
-			"空字符串",
-			args{"", ","},
-			"",
-		},
-		{
-			"分隔符在开头",
-			args{",orange", ","},
-			"",
-		},
-		{
-			"分隔符在结尾",
-			args{"orange,", ","},
-			"orange",
-		},
-		{
-			"多个连续分隔符",
-			args{"apple,,banana", ","},
-			"apple",
-		},
-		{
-			"空分隔符",
-			args{"test", ""},
-			"test",
-		},
-		{
-			"复杂分隔符路径",
-			args{"path/to/file.txt", "/"},
-			"path",
-		},
-		{
-			"中文字符串",
-			args{"苹果,香蕉,橙子", ","},
-			"苹果",
-		},
-		{
-			"特殊字符分隔符",
-			args{"a|b|c", "|"},
-			"a",
-		},
-		{
-			"空格分隔符",
-			args{"hello world", " "},
-			"hello",
-		},
-		{
-			"数字字符串",
-			args{"123,456,789", ","},
-			"123",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := StringGetFirst(tt.args.s, tt.args.sep); got != tt.want {
-				t.Errorf("StringGetFirst() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+    type args struct {
+        s   string
+        sep string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        {
+            "正常情况包含分隔符",
+            args{"apple,banana,cherry", ","},
+            "apple",
+        },
+        {
+            "不包含分隔符",
+            args{"orange", ","},
+            "orange",
+        },
+        {
+            "空字符串",
+            args{"", ","},
+            "",
+        },
+        {
+            "分隔符在开头",
+            args{",orange", ","},
+            "",
+        },
+        {
+            "分隔符在结尾",
+            args{"orange,", ","},
+            "orange",
+        },
+        {
+            "多个连续分隔符",
+            args{"apple,,banana", ","},
+            "apple",
+        },
+        {
+            "空分隔符",
+            args{"test", ""},
+            "test",
+        },
+        {
+            "复杂分隔符路径",
+            args{"path/to/file.txt", "/"},
+            "path",
+        },
+        {
+            "中文字符串",
+            args{"苹果,香蕉,橙子", ","},
+            "苹果",
+        },
+        {
+            "特殊字符分隔符",
+            args{"a|b|c", "|"},
+            "a",
+        },
+        {
+            "空格分隔符",
+            args{"hello world", " "},
+            "hello",
+        },
+        {
+            "数字字符串",
+            args{"123,456,789", ","},
+            "123",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringGetFirst(tt.args.s, tt.args.sep); got != tt.want {
+                t.Errorf("StringGetFirst() = %v, want %v", got, tt.want)
+            }
+        })
+    }
 }
 
 func TestStringSanitizeAsInt(t *testing.T) {
-	type args struct {
-		s string
-	}
-	tests := []struct {
-		name string
-		args args
-		want int
-	}{
-		{
-			"空字符串返回0",
-			args{""},
-			0,
-		},
-		{
-			"纯数字字符串",
-			args{"123"},
-			123,
-		},
-		{
-			"混合字符字符串",
-			args{"abc123def"},
-			123,
-		},
-		{
-			"只有非数字字符",
-			args{"abc"},
-			0,
-		},
-		{
-			"以负号开头的数字",
-			args{"-123"},
-			-123,
-		},
-		{
-			"负号在中间",
-			args{"12-34"},
-			1234,
-		},
-		{
-			"负号在结尾",
-			args{"123-"},
-			123,
-		},
-		{
-			"多个负号",
-			args{"-12-34"},
-			-1234,
-		},
-		{
-			"数字分散在字符串各处",
-			args{"a1b2c3"},
-			123,
-		},
-		{
-			"包含空格和制表符",
-			args{" 123\t456 "},
-			123456,
-		},
-		{
-			"包含标点符号",
-			args{"1,234.56"},
-			123456,
-		},
-		{
-			"包含中文字符",
-			args{"数字123测试"},
-			123,
-		},
-		{
-			"包含特殊字符",
-			args{"1@2#3$4"},
-			1234,
-		},
-		{
-			"零值处理",
-			args{"0"},
-			0,
-		},
-		{
-			"极大数字",
-			args{"999999999"},
-			999999999,
-		},
-		{
-			"极小数字",
-			args{"-999999999"},
-			-999999999,
-		},
-		{
-			"连续数字",
-			args{"123456789"},
-			123456789,
-		},
-		{
-			"数字间有少量非数字字符",
-			args{"1a2b3"},
-			123,
-		},
-		{
-			"只有负号",
-			args{"-"},
-			0,
-		},
-		{
-			"负号后无数字",
-			args{"-abc"},
-			0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := StringSanitizeAsInt(tt.args.s); got != tt.want {
-				t.Errorf("StringSanitizeAsInt() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+    type args struct {
+        s string
+    }
+    tests := []struct {
+        name string
+        args args
+        want int
+    }{
+        {
+            "空字符串返回0",
+            args{""},
+            0,
+        },
+        {
+            "纯数字字符串",
+            args{"123"},
+            123,
+        },
+        {
+            "混合字符字符串",
+            args{"abc123def"},
+            123,
+        },
+        {
+            "只有非数字字符",
+            args{"abc"},
+            0,
+        },
+        {
+            "以负号开头的数字",
+            args{"-123"},
+            -123,
+        },
+        {
+            "负号在中间",
+            args{"12-34"},
+            1234,
+        },
+        {
+            "负号在结尾",
+            args{"123-"},
+            123,
+        },
+        {
+            "多个负号",
+            args{"-12-34"},
+            -1234,
+        },
+        {
+            "数字分散在字符串各处",
+            args{"a1b2c3"},
+            123,
+        },
+        {
+            "包含空格和制表符",
+            args{" 123\t456 "},
+            123456,
+        },
+        {
+            "包含标点符号",
+            args{"1,234.56"},
+            123456,
+        },
+        {
+            "包含中文字符",
+            args{"数字123测试"},
+            123,
+        },
+        {
+            "包含特殊字符",
+            args{"1@2#3$4"},
+            1234,
+        },
+        {
+            "零值处理",
+            args{"0"},
+            0,
+        },
+        {
+            "极大数字",
+            args{"999999999"},
+            999999999,
+        },
+        {
+            "极小数字",
+            args{"-999999999"},
+            -999999999,
+        },
+        {
+            "连续数字",
+            args{"123456789"},
+            123456789,
+        },
+        {
+            "数字间有少量非数字字符",
+            args{"1a2b3"},
+            123,
+        },
+        {
+            "只有负号",
+            args{"-"},
+            0,
+        },
+        {
+            "负号后无数字",
+            args{"-abc"},
+            0,
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringSanitizeAsInt(tt.args.s); got != tt.want {
+                t.Errorf("StringSanitizeAsInt() = %v, want %v", got, tt.want)
+            }
+        })
+    }
 }
 
 func TestStringRemoveLast(t *testing.T) {
@@ -1983,6 +1983,244 @@ func TestStringRemoveLast(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             if got := StringRemoveLast(tt.args.s, tt.args.sep); got != tt.want {
                 t.Errorf("StringRemoveLast() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestStringGetSecond(t *testing.T) {
+    type args struct {
+        s   string
+        sep string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        // A类 - 正常功能测试用例
+        {
+            name: "标准分割场景",
+            args: args{
+                s:   "a,b,c",
+                sep: ",",
+            },
+            want: "b",
+        },
+        {
+            name: "多分隔符场景",
+            args: args{
+                s:   "x|y|z|w",
+                sep: "|",
+            },
+            want: "y",
+        },
+        {
+            name: "多字符分隔符",
+            args: args{
+                s:   "hello::world::test",
+                sep: "::",
+            },
+            want: "world",
+        },
+        {
+            name: "分隔符在开头",
+            args: args{
+                s:   ",b,c",
+                sep: ",",
+            },
+            want: "b",
+        },
+        {
+            name: "包含空格分割",
+            args: args{
+                s:   "one two three",
+                sep: " ",
+            },
+            want: "two",
+        },
+        // B类 - 边界条件测试用例
+        {
+            name: "分隔符不存在",
+            args: args{
+                s:   "abc",
+                sep: ",",
+            },
+            want: "abc",
+        },
+        {
+            name: "空分隔符",
+            args: args{
+                s:   "abc",
+                sep: "",
+            },
+            want: "abc",
+        },
+        {
+            name: "空字符串输入",
+            args: args{
+                s:   "",
+                sep: ",",
+            },
+            want: "",
+        },
+        {
+            name: "分隔符在末尾",
+            args: args{
+                s:   "a,",
+                sep: ",",
+            },
+            want: "",
+        },
+        {
+            name: "连续分隔符",
+            args: args{
+                s:   "a,,c",
+                sep: ",",
+            },
+            want: "",
+        },
+        // C类 - 特殊字符测试用例
+        {
+            name: "中文字符分割",
+            args: args{
+                s:   "北京|上海|广州",
+                sep: "|",
+            },
+            want: "上海",
+        },
+        {
+            name: "特殊字符分隔符",
+            args: args{
+                s:   "a@b@c",
+                sep: "@",
+            },
+            want: "b",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringGetSecond(tt.args.s, tt.args.sep); got != tt.want {
+                t.Errorf("StringGetSecond() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestStringRemoveFirst(t *testing.T) {
+    type args struct {
+        s   string
+        sep string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        // A类 - 正常功能测试用例
+        {
+            name: "标准分割场景",
+            args: args{
+                s:   "a.b.c",
+                sep: ".",
+            },
+            want: "b.c",
+        },
+        {
+            name: "多段分割",
+            args: args{
+                s:   "one/two/three",
+                sep: "/",
+            },
+            want: "two/three",
+        },
+        {
+            name: "多字符分隔符",
+            args: args{
+                s:   "hello::world::test",
+                sep: "::",
+            },
+            want: "world::test",
+        },
+        {
+            name: "分隔符在开头",
+            args: args{
+                s:   ".hidden.file",
+                sep: ".",
+            },
+            want: "hidden.file",
+        },
+        {
+            name: "只有一个分隔符",
+            args: args{
+                s:   "before.after",
+                sep: ".",
+            },
+            want: "after",
+        },
+        // B类 - 边界条件测试用例
+        {
+            name: "分隔符不存在",
+            args: args{
+                s:   "noSeparator",
+                sep: ".",
+            },
+            want: "noSeparator",
+        },
+        {
+            name: "空字符串输入",
+            args: args{
+                s:   "",
+                sep: ".",
+            },
+            want: "",
+        },
+        {
+            name: "空分隔符",
+            args: args{
+                s:   "test",
+                sep: "",
+            },
+            want: "test",
+        },
+        {
+            name: "连续分隔符",
+            args: args{
+                s:   "a..b",
+                sep: ".",
+            },
+            want: ".b",
+        },
+        // C类 - 实际场景测试用例
+        {
+            name: "URL路径处理",
+            args: args{
+                s:   "http://example.com/path",
+                sep: "/",
+            },
+            want: "/example.com/path",
+        },
+        {
+            name: "文件路径处理",
+            args: args{
+                s:   "folder/subfolder/file.txt",
+                sep: "/",
+            },
+            want: "subfolder/file.txt",
+        },
+        {
+            name: "中文字符分割",
+            args: args{
+                s:   "北京|上海|广州",
+                sep: "|",
+            },
+            want: "上海|广州",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringRemoveFirst(tt.args.s, tt.args.sep); got != tt.want {
+                t.Errorf("StringRemoveFirst() = %v, want %v", got, tt.want)
             }
         })
     }
