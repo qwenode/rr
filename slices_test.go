@@ -369,4 +369,137 @@ func TestSlicesDeleteArrayCustomType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSlicesUnique(t *testing.T) {
+	tests := []struct {
+		name    string
+		sources []int
+		want    []int
+	}{
+		{
+			"无重复元素",
+			[]int{1, 2, 3, 4, 5},
+			[]int{1, 2, 3, 4, 5},
+		},
+		{
+			"有重复元素",
+			[]int{1, 2, 2, 3, 3, 3, 4, 5, 5},
+			[]int{1, 2, 3, 4, 5},
+		},
+		{
+			"全部重复元素",
+			[]int{1, 1, 1, 1, 1},
+			[]int{1},
+		},
+		{
+			"空切片",
+			[]int{},
+			[]int{},
+		},
+		{
+			"nil切片",
+			nil,
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesUnique(tt.sources); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesUnique() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesUniqueString(t *testing.T) {
+	tests := []struct {
+		name    string
+		sources []string
+		want    []string
+	}{
+		{
+			"无重复字符串",
+			[]string{"apple", "banana", "cherry"},
+			[]string{"apple", "banana", "cherry"},
+		},
+		{
+			"有重复字符串",
+			[]string{"apple", "banana", "apple", "cherry", "banana"},
+			[]string{"apple", "banana", "cherry"},
+		},
+		{
+			"全部重复字符串",
+			[]string{"apple", "apple", "apple"},
+			[]string{"apple"},
+		},
+		{
+			"包含空字符串",
+			[]string{"apple", "", "banana", "", "cherry"},
+			[]string{"apple", "", "banana", "cherry"},
+		},
+		{
+			"空切片",
+			[]string{},
+			[]string{},
+		},
+		{
+			"nil切片",
+			nil,
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesUnique(tt.sources); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesUnique() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesUniqueCustomType(t *testing.T) {
+	person1 := Person{"Alice", 25}
+	person2 := Person{"Bob", 30}
+	person3 := Person{"Charlie", 35}
+	person4 := Person{"Alice", 25} // 与person1值相同但是不同实例
+
+	tests := []struct {
+		name    string
+		sources []Person
+		want    []Person
+	}{
+		{
+			"无重复结构体",
+			[]Person{person1, person2, person3},
+			[]Person{person1, person2, person3},
+		},
+		{
+			"有重复结构体",
+			[]Person{person1, person2, person4, person3, person1},
+			[]Person{person1, person2, person3},
+		},
+		{
+			"全部重复结构体",
+			[]Person{person1, person4, person1},
+			[]Person{person1},
+		},
+		{
+			"空切片",
+			[]Person{},
+			[]Person{},
+		},
+		{
+			"nil切片",
+			nil,
+			nil,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesUnique(tt.sources); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesUnique() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 } 

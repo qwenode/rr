@@ -1,5 +1,25 @@
 package rr
 
+func SlicesUnique[T comparable](sources []T) []T {
+    if sources == nil {
+        return sources
+    }
+    
+    // 使用map来存储唯一值
+    seen := make(map[T]struct{})
+    result := make([]T, 0, len(sources))
+    
+    // 遍历切片，将未见过的元素添加到结果中
+    for _, v := range sources {
+        if _, exists := seen[v]; !exists {
+            seen[v] = struct{}{}
+            result = append(result, v)
+        }
+    }
+    
+    return result
+}
+
 func SlicesDelete[T comparable](sources []T, deleteElement T) []T {
     if sources == nil {
         return sources
