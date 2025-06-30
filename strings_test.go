@@ -2292,3 +2292,72 @@ func TestStringIsUrl(t *testing.T) {
         })
     }
 }
+
+func TestIsChinese(t *testing.T) {
+    type args struct {
+        s string
+    }
+    tests := []struct {
+        name string
+        args args
+        want bool
+    }{
+        {
+            "纯中文字符串",
+            args{"你好世界"},
+            true,
+        },
+        {
+            "混合中英文字符串",
+            args{"Hello你好World世界"},
+            true,
+        },
+        {
+            "纯英文字符串",
+            args{"Hello World"},
+            false,
+        },
+        {
+            "特殊字符",
+            args{"!@#$%^&*()"},
+            false,
+        },
+        {
+            "空字符串",
+            args{""},
+            false,
+        },
+        {
+            "数字字符串",
+            args{"12345"},
+            false,
+        },
+        {
+            "日文字符串",
+            args{"こんにちは"},
+            false,
+        },
+        {
+            "韩文字符串",
+            args{"안녕하세요"},
+            false,
+        },
+        {
+            "中文标点符号",
+            args{"。，！？"},
+            false,
+        },
+        {
+            "单个中文字符",
+            args{"中"},
+            true,
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := IsChinese(tt.args.s); got != tt.want {
+                t.Errorf("IsChinese() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}

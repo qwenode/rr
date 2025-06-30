@@ -179,4 +179,194 @@ func TestSlicesDeleteCustomType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSlicesDeleteArray(t *testing.T) {
+	tests := []struct {
+		name          string
+		sources       []int
+		deleteElement []int
+		want          []int
+	}{
+		{
+			"删除多个存在的元素",
+			[]int{1, 2, 3, 4, 5, 6, 7},
+			[]int{2, 4, 6},
+			[]int{1, 3, 5, 7},
+		},
+		{
+			"删除不存在的元素",
+			[]int{1, 2, 3, 4, 5},
+			[]int{6, 7, 8},
+			[]int{1, 2, 3, 4, 5},
+		},
+		{
+			"删除部分存在的元素",
+			[]int{1, 2, 3, 4, 5},
+			[]int{3, 6, 7},
+			[]int{1, 2, 4, 5},
+		},
+		{
+			"空源切片",
+			[]int{},
+			[]int{1, 2, 3},
+			[]int{},
+		},
+		{
+			"nil源切片",
+			nil,
+			[]int{1, 2, 3},
+			nil,
+		},
+		{
+			"nil删除元素切片",
+			[]int{1, 2, 3, 4, 5},
+			nil,
+			[]int{1, 2, 3, 4, 5},
+		},
+		{
+			"空删除元素切片",
+			[]int{1, 2, 3, 4, 5},
+			[]int{},
+			[]int{1, 2, 3, 4, 5},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesDeleteArray(tt.sources, tt.deleteElement); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesDeleteArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesDeleteArrayString(t *testing.T) {
+	tests := []struct {
+		name          string
+		sources       []string
+		deleteElement []string
+		want          []string
+	}{
+		{
+			"删除多个存在的字符串",
+			[]string{"apple", "banana", "cherry", "date", "elderberry", "fig"},
+			[]string{"banana", "date", "fig"},
+			[]string{"apple", "cherry", "elderberry"},
+		},
+		{
+			"删除不存在的字符串",
+			[]string{"apple", "banana", "cherry"},
+			[]string{"date", "elderberry", "fig"},
+			[]string{"apple", "banana", "cherry"},
+		},
+		{
+			"删除部分存在的字符串",
+			[]string{"apple", "banana", "cherry", "date"},
+			[]string{"banana", "fig", "grape"},
+			[]string{"apple", "cherry", "date"},
+		},
+		{
+			"空源切片",
+			[]string{},
+			[]string{"apple", "banana"},
+			[]string{},
+		},
+		{
+			"nil源切片",
+			nil,
+			[]string{"apple", "banana"},
+			nil,
+		},
+		{
+			"nil删除元素切片",
+			[]string{"apple", "banana", "cherry"},
+			nil,
+			[]string{"apple", "banana", "cherry"},
+		},
+		{
+			"空删除元素切片",
+			[]string{"apple", "banana", "cherry"},
+			[]string{},
+			[]string{"apple", "banana", "cherry"},
+		},
+		{
+			"删除包含空字符串",
+			[]string{"apple", "", "banana", "cherry"},
+			[]string{"", "banana"},
+			[]string{"apple", "cherry"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesDeleteArray(tt.sources, tt.deleteElement); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesDeleteArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesDeleteArrayCustomType(t *testing.T) {
+	person1 := Person{"Alice", 25}
+	person2 := Person{"Bob", 30}
+	person3 := Person{"Charlie", 35}
+	person4 := Person{"David", 40}
+	person5 := Person{"Eve", 45}
+	person6 := Person{"Alice", 25} // 与person1值相同但是不同实例
+
+	tests := []struct {
+		name          string
+		sources       []Person
+		deleteElement []Person
+		want          []Person
+	}{
+		{
+			"删除多个存在的自定义类型元素",
+			[]Person{person1, person2, person3, person4, person5},
+			[]Person{person2, person4},
+			[]Person{person1, person3, person5},
+		},
+		{
+			"删除不存在的自定义类型元素",
+			[]Person{person1, person2, person3},
+			[]Person{Person{"Frank", 50}, Person{"Grace", 55}},
+			[]Person{person1, person2, person3},
+		},
+		{
+			"删除值相同的自定义类型元素",
+			[]Person{person1, person2, person3, person6}, // person6与person1值相同
+			[]Person{person1},
+			[]Person{person2, person3},
+		},
+		{
+			"空源切片",
+			[]Person{},
+			[]Person{person1, person2},
+			[]Person{},
+		},
+		{
+			"nil源切片",
+			nil,
+			[]Person{person1, person2},
+			nil,
+		},
+		{
+			"nil删除元素切片",
+			[]Person{person1, person2, person3},
+			nil,
+			[]Person{person1, person2, person3},
+		},
+		{
+			"空删除元素切片",
+			[]Person{person1, person2, person3},
+			[]Person{},
+			[]Person{person1, person2, person3},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesDeleteArray(tt.sources, tt.deleteElement); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("SlicesDeleteArray() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 } 

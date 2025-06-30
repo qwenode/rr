@@ -10,6 +10,17 @@ import (
     "sync"
 )
 
+func IsChinese(s string) bool {
+    containsChinese := false
+    for _, r := range s {
+        if r >= 0x4E00 && r <= 0x9FFF {
+            containsChinese = true
+            break
+        }
+    }
+    return containsChinese
+}
+
 // 字符串转bytes 20250617
 func StringToBytes(s string) []byte {
     return []byte(s)
