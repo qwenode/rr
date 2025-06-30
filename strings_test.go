@@ -2361,3 +2361,97 @@ func TestIsChinese(t *testing.T) {
         })
     }
 }
+
+func TestStringToTitle(t *testing.T) {
+    type args struct {
+        s string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        {
+            name: "空字符串",
+            args: args{s: ""},
+            want: "",
+        },
+        {
+            name: "单个小写单词",
+            args: args{s: "hello"},
+            want: "Hello",
+        },
+        {
+            name: "单个大写单词",
+            args: args{s: "HELLO"},
+            want: "Hello",
+        },
+        {
+            name: "单个混合大小写单词",
+            args: args{s: "hElLo"},
+            want: "Hello",
+        },
+        {
+            name: "空格分隔的多个单词",
+            args: args{s: "hello world"},
+            want: "Hello World",
+        },
+        {
+            name: "下划线分隔的多个单词",
+            args: args{s: "hello_world"},
+            want: "Hello World",
+        },
+        {
+            name: "横线分隔的多个单词",
+            args: args{s: "hello-world"},
+            want: "Hello World",
+        },
+        {
+            name: "驼峰格式",
+            args: args{s: "helloWorld"},
+            want: "Hello World",
+        },
+        {
+            name: "大驼峰格式",
+            args: args{s: "HelloWorld"},
+            want: "Hello World",
+        },
+        {
+            name: "混合分隔符",
+            args: args{s: "hello_world-example test"},
+            want: "Hello World Example Test",
+        },
+        {
+            name: "连续分隔符",
+            args: args{s: "hello__world--test  example"},
+            want: "Hello World Test Example",
+        },
+        {
+            name: "数字和字母混合",
+            args: args{s: "hello123world"},
+            want: "Hello 123 World",
+        },
+        {
+            name: "数字和字母混合带分隔符",
+            args: args{s: "hello_123_world"},
+            want: "Hello 123 World",
+        },
+        {
+            name: "特殊驼峰格式",
+            args: args{s: "JSONData"},
+            want: "Json Data",
+        },
+        {
+            name: "多个大写字母",
+            args: args{s: "APIResponse"},
+            want: "Api Response",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringToTitle(tt.args.s); got != tt.want {
+                t.Errorf("StringToTitle() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
