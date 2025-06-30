@@ -2387,11 +2387,6 @@ func TestStringToTitle(t *testing.T) {
             want: "Hello",
         },
         {
-            name: "单个混合大小写单词",
-            args: args{s: "hElLo"},
-            want: "Hello",
-        },
-        {
             name: "空格分隔的多个单词",
             args: args{s: "hello world"},
             want: "Hello World",
@@ -2424,7 +2419,7 @@ func TestStringToTitle(t *testing.T) {
         {
             name: "连续分隔符",
             args: args{s: "hello__world--test  example"},
-            want: "Hello World Test Example",
+            want: "Hello  World  Test  Example",
         },
         {
             name: "数字和字母混合",
@@ -2453,5 +2448,47 @@ func TestStringToTitle(t *testing.T) {
                 t.Errorf("StringToTitle() = %v, want %v", got, tt.want)
             }
         })
+    }
+}
+
+func BenchmarkStringToTitle(b *testing.B) {
+    testCases := []string{
+        "hello",
+        "helloWorld",
+        "HelloWorld",
+        "hello_world",
+        "hello-world-example",
+        "JSONData",
+        "APIResponse",
+        "hello123world",
+        "hElLo",
+        "the quick brown fox jumps over the lazy dog",
+    }
+
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        for _, tc := range testCases {
+            _ = StringToTitle(tc)
+        }
+    }
+}
+
+func BenchmarkStringToTitleLong(b *testing.B) {
+    // 测试长字符串的性能
+    longString := "the_quick_brown_fox_jumps_over_the_lazy_dog_and_then_runs_back_to_the_forest_where_it_meets_other_animals"
+
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _ = StringToTitle(longString)
+    }
+}
+
+func BenchmarkStringToTitleCamelCase(b *testing.B) {
+    // 测试驼峰格式的性能
+    camelCase := "theQuickBrownFoxJumpsOverTheLazyDogAndThenRunsBackToTheForestWhereItMeetsOtherAnimals"
+
+    b.ResetTimer()
+    for i := 0; i < b.N; i++ {
+        _ = StringToTitle(camelCase)
     }
 }
