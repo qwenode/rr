@@ -502,4 +502,196 @@ func TestSlicesUniqueCustomType(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSlicesIsNil(t *testing.T) {
+	tests := []struct {
+		name string
+		arr  []int
+		want bool
+	}{
+		{
+			"nil切片",
+			nil,
+			true,
+		},
+		{
+			"空切片",
+			[]int{},
+			true,
+		},
+		{
+			"非空切片",
+			[]int{1, 2, 3},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsNil(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsNil() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesIsNilString(t *testing.T) {
+	tests := []struct {
+		name string
+		arr  []string
+		want bool
+	}{
+		{
+			"nil字符串切片",
+			nil,
+			true,
+		},
+		{
+			"空字符串切片",
+			[]string{},
+			true,
+		},
+		{
+			"非空字符串切片",
+			[]string{"apple", "banana", "cherry"},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsNil(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsNil() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesIsNilCustomType(t *testing.T) {
+	person1 := Person{"Alice", 25}
+	person2 := Person{"Bob", 30}
+
+	tests := []struct {
+		name string
+		arr  []Person
+		want bool
+	}{
+		{
+			"nil自定义类型切片",
+			nil,
+			true,
+		},
+		{
+			"空自定义类型切片",
+			[]Person{},
+			true,
+		},
+		{
+			"非空自定义类型切片",
+			[]Person{person1, person2},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsNil(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsNil() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesIsEmpty(t *testing.T) {
+	tests := []struct {
+		name string
+		arr  []int
+		want bool
+	}{
+		{
+			"nil切片",
+			nil,
+			true,
+		},
+		{
+			"空切片",
+			[]int{},
+			true,
+		},
+		{
+			"非空切片",
+			[]int{1, 2, 3},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsEmpty(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsEmpty() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesIsEmptyString(t *testing.T) {
+	tests := []struct {
+		name string
+		arr  []string
+		want bool
+	}{
+		{
+			"nil字符串切片",
+			nil,
+			true,
+		},
+		{
+			"空字符串切片",
+			[]string{},
+			true,
+		},
+		{
+			"非空字符串切片",
+			[]string{"apple", "banana", "cherry"},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsEmpty(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsEmpty() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestSlicesIsEmptyCustomType(t *testing.T) {
+	person1 := Person{"Alice", 25}
+	person2 := Person{"Bob", 30}
+
+	tests := []struct {
+		name string
+		arr  []Person
+		want bool
+	}{
+		{
+			"nil自定义类型切片",
+			nil,
+			true,
+		},
+		{
+			"空自定义类型切片",
+			[]Person{},
+			true,
+		},
+		{
+			"非空自定义类型切片",
+			[]Person{person1, person2},
+			false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := SlicesIsEmpty(tt.arr); got != tt.want {
+				t.Errorf("SlicesIsEmpty() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 } 
