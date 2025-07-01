@@ -2492,3 +2492,106 @@ func BenchmarkStringToTitleCamelCase(b *testing.B) {
         _ = StringToTitle(camelCase)
     }
 }
+
+func TestStringSplitByPunctuation(t *testing.T) {
+    tests := []struct {
+        name     string
+        input    string
+        expected []string
+    }{
+        {
+            name:     "空字符串测试",
+            input:    "",
+            expected: []string{},
+        },
+        {
+            name:     "英文标点符号测试",
+            input:    "Hello, World! How are you?",
+            expected: []string{"Hello", "World", "How are you"},
+        },
+        {
+            name:     "中文标点符号测试",
+            input:    "你好，世界！今天天气不错？",
+            expected: []string{"你好", "世界", "今天天气不错"},
+        },
+        {
+            name:     "多个连续标点符号测试",
+            input:    "Hello!!!World???How...are,,,you",
+            expected: []string{"Hello", "World", "How", "are", "you"},
+        },
+        {
+            name:     "包含空格的测试",
+            input:    "  Hello,   World  !  ",
+            expected: []string{"Hello", "World"},
+        },
+        {
+            name:     "混合标点符号测试",
+            input:    "Hello,世界!How?你好~Good.不错",
+            expected: []string{"Hello", "世界", "How", "你好", "Good", "不错"},
+        },
+        {
+            name:     "无标点符号测试",
+            input:    "Hello World",
+            expected: []string{"Hello World"},
+        },
+        {
+            name:     "数字和标点混合测试",
+            input:    "123,456.789!1000?2000",
+            expected: []string{"123", "456", "789", "1000", "2000"},
+        },
+        {
+            name:     "日语和标点测试",
+            input:    "こんにちは。世界！お元気ですか？",
+            expected: []string{"こんにちは", "世界", "お元気ですか"},
+        },
+        {
+            name:     "韩语和标点测试",
+            input:    "안녕하세요,세상!잘 지내요?",
+            expected: []string{"안녕하세요", "세상", "잘 지내요"},
+        },
+        {
+            name:     "阿拉伯数字和中文数字混合测试",
+            input:    "1二3，四5！六7。八9",
+            expected: []string{"1二3", "四5", "六7", "八9"},
+        },
+        {
+            name:     "特殊符号测试",
+            input:    "Hello@World#Python$Go%Java&Rust",
+            expected: []string{"Hello", "World", "Python", "Go", "Java", "Rust"},
+        },
+        {
+            name:     "数学表达式测试",
+            input:    "1+2=3, 4-5=(-1), 6*7=42",
+            expected: []string{"1", "2", "3", "4", "5", "1", "6", "7", "42"},
+        },
+        {
+            name:     "网址和邮箱分割测试",
+            input:    "contact@example.com;https://example.com",
+            expected: []string{"contact", "example", "com", "https", "example", "com"},
+        },
+        {
+            name:     "表情符号测试",
+            input:    "Hello😊World!Happy😂Day",
+            expected: []string{"Hello", "World", "Happy", "Day"},
+        },
+        {
+            name:     "多语言混合测试",
+            input:    "Hello,你好,こんにちは,안녕하세요!",
+            expected: []string{"Hello", "你好", "こんにちは", "안녕하세요"},
+        },
+        {
+            name:     "货币符号测试",
+            input:    "$100,¥200,€300,£400",
+            expected: []string{"100", "200", "300", "400"},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := StringSplitByPunctuation(tt.input)
+            if !reflect.DeepEqual(got, tt.expected) {
+                t.Errorf("StringSplitByPunctuation() = %v, want %v", got, tt.expected)
+            }
+        })
+    }
+}

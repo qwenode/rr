@@ -1118,3 +1118,27 @@ func StringToTitle(s string) string {
     s = strings.ReplaceAll(s, "_", " ")
     return cases.Title(language.English).String(s)
 }
+
+// 按任意标点符号分割字符串 20250701
+func StringSplitByPunctuation(s string) []string {
+    if s == "" {
+        return []string{}
+    }
+
+    // 使用正则表达式匹配所有标点符号
+    re := regexp.MustCompile(`[^\p{L}\p{N}\s]`)
+
+    // 分割字符串
+    parts := re.Split(s, -1)
+
+    // 过滤空字符串并去除首尾空格
+    result := make([]string, 0, len(parts))
+    for _, part := range parts {
+        trimmed := strings.TrimSpace(part)
+        if trimmed != "" {
+            result = append(result, trimmed)
+        }
+    }
+
+    return result
+}
