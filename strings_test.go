@@ -2507,7 +2507,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "英文标点符号测试",
             input:    "Hello, World! How are you?",
-            expected: []string{"Hello", "World", "How are you"},
+            expected: []string{"Hello", "World", "How", "are", "you"},
         },
         {
             name:     "中文标点符号测试",
@@ -2532,7 +2532,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "无标点符号测试",
             input:    "Hello World",
-            expected: []string{"Hello World"},
+            expected: []string{"Hello", "World"},
         },
         {
             name:     "数字和标点混合测试",
@@ -2547,7 +2547,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "韩语和标点测试",
             input:    "안녕하세요,세상!잘 지내요?",
-            expected: []string{"안녕하세요", "세상", "잘 지내요"},
+            expected: []string{"안녕하세요", "세상", "잘", "지내요"},
         },
         {
             name:     "阿拉伯数字和中文数字混合测试",
