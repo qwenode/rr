@@ -2507,7 +2507,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "英文标点符号测试",
             input:    "Hello, World! How are you?",
-            expected: []string{"Hello", "World", "How", "are", "you"},
+            expected: []string{"Hello", "World", "How are you"},
         },
         {
             name:     "中文标点符号测试",
@@ -2532,7 +2532,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "无标点符号测试",
             input:    "Hello World",
-            expected: []string{"Hello", "World"},
+            expected: []string{"Hello World"},
         },
         {
             name:     "数字和标点混合测试",
@@ -2547,7 +2547,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
         {
             name:     "韩语和标点测试",
             input:    "안녕하세요,세상!잘 지내요?",
-            expected: []string{"안녕하세요", "세상", "잘", "지내요"},
+            expected: []string{"안녕하세요", "세상", "잘 지내요"},
         },
         {
             name:     "阿拉伯数字和中文数字混合测试",
@@ -2583,11 +2583,6 @@ func TestStringSplitByPunctuation(t *testing.T) {
             name:     "货币符号测试",
             input:    "$100,¥200,€300,£400",
             expected: []string{"100", "200", "300", "400"},
-        },
-        {
-            name:     "多个空格类型测试",
-            input:    "Hello　World    Test\t\nExample", // 包含全角空格、多个空格、制表符、换行符
-            expected: []string{"Hello", "World", "Test", "Example"},
         },
         {
             name:     "空格与标点组合测试",
@@ -2635,7 +2630,8 @@ func TestStringSplitByPunctuation(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             got := StringSplitByPunctuation(tt.input)
             if !reflect.DeepEqual(got, tt.expected) {
-                t.Errorf("StringSplitByPunctuation() = %v, want %v", got, tt.expected)
+
+                t.Errorf("StringSplitByPunctuation() = %v, want %v", JsonSerialize(got), tt.expected)
             }
         })
     }

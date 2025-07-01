@@ -1126,7 +1126,7 @@ func StringSplitByPunctuation(s string) []string {
     }
     s = strings.ReplaceAll(s, "\n", " ")
     // 使用正则表达式匹配所有标点符号
-    re := regexp.MustCompile(`[^\p{L}\p{N}]`)
+    re := regexp.MustCompile(`[^\p{L}\p{N}\s]`)
 
     // 分割字符串
     parts := re.Split(s, -1)
