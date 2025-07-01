@@ -2575,7 +2575,7 @@ func TestStringSplitByPunctuation(t *testing.T) {
             expected: []string{"Hello", "World", "Happy", "Day"},
         },
         {
-            name:     "多语言混合测试",
+            name:     `多语言混合测试`,
             input:    "Hello,你好,こんにちは,안녕하세요!",
             expected: []string{"Hello", "你好", "こんにちは", "안녕하세요"},
         },
@@ -2583,6 +2583,51 @@ func TestStringSplitByPunctuation(t *testing.T) {
             name:     "货币符号测试",
             input:    "$100,¥200,€300,£400",
             expected: []string{"100", "200", "300", "400"},
+        },
+        {
+            name:     "多个空格类型测试",
+            input:    "Hello　World    Test\t\nExample", // 包含全角空格、多个空格、制表符、换行符
+            expected: []string{"Hello", "World", "Test", "Example"},
+        },
+        {
+            name:     "空格与标点组合测试",
+            input:    "Hello   ,   World   !   Test   .   Example",
+            expected: []string{"Hello", "World", "Test", "Example"},
+        },
+        {
+            name:     "首尾空格测试",
+            input:    "   Hello, World!   ",
+            expected: []string{"Hello", "World"},
+        },
+        {
+            name:     "仅空格测试",
+            input:    "     \t\n\r    　　", // 包含普通空格、制表符、换行符、回车符、全角空格
+            expected: []string{},
+        },
+        {
+            name:     "空格分隔的数字测试",
+            input:    "1  ,  2  .  3  !  4",
+            expected: []string{"1", "2", "3", "4"},
+        },
+        {
+            name:     "中文空格混合测试",
+            input:    "你好　，　世界　！　测试", // 使用全角空格
+            expected: []string{"你好", "世界", "测试"},
+        },
+        {
+            name:     "不间断空格测试", // \u00A0
+            input:    "Hello\u00A0,\u00A0World\u00A0!\u00A0Test",
+            expected: []string{"Hello", "World", "Test"},
+        },
+        {
+            name:     "零宽空格测试", // \u200B
+            input:    "Hello\u200B,\u200BWorld\u200B!\u200BTest",
+            expected: []string{"Hello", "World", "Test"},
+        },
+        {
+            name:     "混合空格与标点测试",
+            input:    "Hello　 \t,\n World\r!　Test\u00A0.\u200B\tExample",
+            expected: []string{"Hello", "World", "Test", "Example"},
         },
     }
 
