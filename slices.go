@@ -66,3 +66,32 @@ func SlicesDeleteArray[T comparable](sources []T, deleteElement []T) []T {
 
     return res
 }
+
+// 返回存在于 source 中但不存在于 reference 中的元素
+func SlicesNotIn[T comparable](source []T, reference []T) []T {
+    // 处理边界情况
+    if source == nil || reference == nil {
+        return nil
+    }
+    if len(source) == 0 {
+        return nil
+    }
+
+    // 创建map存储 reference 切片的元素
+    referenceMap := make(map[T]struct{})
+    for _, v := range reference {
+        referenceMap[v] = struct{}{}
+    }
+
+    // 创建结果切片存储不在 reference 中的元素
+    result := make([]T, 0)
+
+    // 遍历 source 切片，找出在 reference 中不存在的元素
+    for _, v := range source {
+        if _, exists := referenceMap[v]; !exists {
+            result = append(result, v)
+        }
+    }
+
+    return result
+}
