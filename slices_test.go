@@ -2,6 +2,7 @@ package rr
 
 import (
     "reflect"
+    "strings"
     "testing"
 )
 
@@ -1166,6 +1167,189 @@ func TestSlicesUniqueAppendCustomType(t *testing.T) {
             got := SlicesUniqueAppend(tt.sources, tt.appendElement)
             if !reflect.DeepEqual(got, tt.want) {
                 t.Errorf("SlicesUniqueAppend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestSlicesUniqueCallback(t *testing.T) {
+    tests := []struct {
+        name     string
+        sources  []int
+        callback func(int) int
+        want     []int
+    }{
+        {
+            name:    "转换为负数并去重",
+            sources: []int{1, 2, 3, 2, 1},
+            callback: func(n int) int {
+                return -n
+            },
+            want: []int{-1, -2, -3},
+        },
+        {
+            name:    "数字翻倍并去重",
+            sources: []int{1, 2, 3, 2, 1},
+            callback: func(n int) int {
+                return n * 2
+            },
+            want: []int{2, 4, 6},
+        },
+        {
+            name:    "nil切片",
+            sources: nil,
+            callback: func(n int) int {
+                return n
+            },
+            want: nil,
+        },
+        {
+            name:    "空切片",
+            sources: []int{},
+            callback: func(n int) int {
+                return n
+            },
+            want: []int{},
+        },
+        {
+            name:    "全部转换为相同值",
+            sources: []int{1, 2, 3, 4, 5},
+            callback: func(n int) int {
+                return 1
+            },
+            want: []int{1},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := SlicesUniqueCallback(tt.sources, tt.callback); !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueCallback() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestSlicesUniqueCallbackString(t *testing.T) {
+    tests := []struct {
+        name     string
+        sources  []string
+        callback func(string) string
+        want     []string
+    }{
+        {
+            name:    "转换为大写并去重",
+            sources: []string{"hello", "world", "Hello", "WORLD"},
+            callback: func(s string) string {
+                return strings.ToUpper(s)
+            },
+            want: []string{"HELLO", "WORLD"},
+        },
+        {
+            name:    "去除空格并去重",
+            sources: []string{" hello ", "world ", " hello", " world "},
+            callback: func(s string) string {
+                return strings.TrimSpace(s)
+            },
+            want: []string{"hello", "world"},
+        },
+        {
+            name:    "添加前缀并去重",
+            sources: []string{"apple", "banana", "apple"},
+            callback: func(s string) string {
+                return "fruit_" + s
+            },
+            want: []string{"fruit_apple", "fruit_banana"},
+        },
+        {
+            name:    "nil切片",
+            sources: nil,
+            callback: func(s string) string {
+                return s
+            },
+            want: nil,
+        },
+        {
+            name:    "空切片",
+            sources: []string{},
+            callback: func(s string) string {
+                return s
+            },
+            want: []string{},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := SlicesUniqueCallback(tt.sources, tt.callback); !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueCallback() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestSlicesUniqueCallbackCustomType(t *testing.T) {
+    tests := []struct {
+        name     string
+        sources  []Person
+        callback func(Person) Person
+        want     []Person
+    }{
+        {
+            name: "增加年龄并去重",
+            sources: []Person{
+                {"Alice", 25},
+                {"Bob", 30},
+                {"Alice", 25},
+            },
+            callback: func(p Person) Person {
+                p.Age += 1
+                return p
+            },
+            want: []Person{
+                {"Alice", 26},
+                {"Bob", 31},
+            },
+        },
+        {
+            name: "转换名字为大写并去重",
+            sources: []Person{
+                {"Alice", 25},
+                {"bob", 30},
+                {"BOB", 30},
+                {"alice", 25},
+            },
+            callback: func(p Person) Person {
+                p.Name = strings.ToUpper(p.Name)
+                return p
+            },
+            want: []Person{
+                {"ALICE", 25},
+                {"BOB", 30},
+            },
+        },
+        {
+            name:    "nil切片",
+            sources: nil,
+            callback: func(p Person) Person {
+                return p
+            },
+            want: nil,
+        },
+        {
+            name:    "空切片",
+            sources: []Person{},
+            callback: func(p Person) Person {
+                return p
+            },
+            want: []Person{},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := SlicesUniqueCallback(tt.sources, tt.callback); !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueCallback() = %v, want %v", got, tt.want)
             }
         })
     }
