@@ -14,7 +14,7 @@ func SlicesIsEmpty[T comparable](arr []T) bool {
 }
 
 // 支持对数据做预处理 20250711
-func SlicesUniqueCallback[T comparable](sources []T, callback func(before T) T) []T {
+func SlicesUniqueCallback[T comparable](sources []T, callback func(before T) (after T)) []T {
     if sources == nil {
         return sources
     }
