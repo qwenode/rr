@@ -731,7 +731,7 @@ func TestSlicesNotIn(t *testing.T) {
             "空source切片",
             []int{},
             []int{1, 2, 3},
-            nil,
+            []int{},
         },
         {
             "空reference切片",
@@ -743,7 +743,7 @@ func TestSlicesNotIn(t *testing.T) {
             "两个空切片",
             []int{},
             []int{},
-            nil,
+            []int{},
         },
         {
             "nil source切片",
@@ -755,7 +755,7 @@ func TestSlicesNotIn(t *testing.T) {
             "nil reference切片",
             []int{1, 2, 3},
             nil,
-            nil,
+            []int{1, 2, 3},
         },
         {
             "两个nil切片",
@@ -844,7 +844,7 @@ func TestSlicesNotInString(t *testing.T) {
             "空source字符串切片",
             []string{},
             []string{"apple", "banana"},
-            nil,
+            []string{},
         },
         {
             "空reference字符串切片",
@@ -862,7 +862,7 @@ func TestSlicesNotInString(t *testing.T) {
             "nil reference字符串切片",
             []string{"apple", "banana"},
             nil,
-            nil,
+            []string{"apple", "banana"},
         },
         {
             "大小写敏感测试",
@@ -928,7 +928,7 @@ func TestSlicesNotInCustomType(t *testing.T) {
             "空source自定义类型切片",
             []Person{},
             []Person{person1, person2},
-            nil,
+            []Person{},
         },
         {
             "空reference自定义类型切片",
@@ -946,7 +946,7 @@ func TestSlicesNotInCustomType(t *testing.T) {
             "nil reference自定义类型切片",
             []Person{person1, person2},
             nil,
-            nil,
+            []Person{person1, person2},
         },
         {
             "重复自定义类型元素",

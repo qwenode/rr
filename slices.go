@@ -67,14 +67,12 @@ func SlicesDeleteArray[T comparable](sources []T, deleteElement []T) []T {
     return res
 }
 
-// 返回存在于 source 中但不存在于 reference 中的元素
+// 返回不在 reference 中的元素
 func SlicesNotIn[T comparable](source []T, reference []T) []T {
+
     // 处理边界情况
-    if source == nil || reference == nil {
-        return nil
-    }
-    if len(source) == 0 {
-        return nil
+    if source == nil || reference == nil || len(source) == 0 {
+        return source
     }
 
     // 创建map存储 reference 切片的元素
