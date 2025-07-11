@@ -12,6 +12,28 @@ func SlicesIsEmpty[T comparable](arr []T) bool {
     }
     return false
 }
+
+// 支持对数据做预处理 20250711
+func SlicesUniqueCallback[T comparable](sources []T, callback func(before T) T) []T {
+    if sources == nil {
+        return sources
+    }
+
+    // 使用map来存储唯一值
+    seen := make(map[T]struct{})
+    result := make([]T, 0, len(sources))
+
+    // 遍历切片，将未见过的元素添加到结果中
+    for _, v := range sources {
+        v = callback(v)
+        if _, exists := seen[v]; !exists {
+            seen[v] = struct{}{}
+            result = append(result, v)
+        }
+    }
+
+    return result
+}
 func SlicesUnique[T comparable](sources []T) []T {
     if sources == nil {
         return sources
