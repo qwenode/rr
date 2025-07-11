@@ -95,3 +95,24 @@ func SlicesNotIn[T comparable](source []T, reference []T) []T {
 
     return result
 }
+
+// 将 appendElement 中的元素添加到 sources 中，如果 sources 中已经存在，则不添加
+func SlicesUniqueAppend[T comparable](sources []T, appendElement []T) []T {
+    if appendElement == nil {
+        return sources
+    }
+    if sources == nil {
+        return appendElement
+    }
+    exists := make(map[T]struct{})
+    for _, v := range sources {
+        exists[v] = struct{}{}
+    }
+    for _, v := range appendElement {
+        if _, found := exists[v]; !found {
+            exists[v] = struct{}{}
+            sources = append(sources, v)
+        }
+    }
+    return sources
+}

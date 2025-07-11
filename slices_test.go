@@ -975,3 +975,198 @@ func TestSlicesNotInCustomType(t *testing.T) {
         })
     }
 }
+
+func TestSlicesUniqueAppend(t *testing.T) {
+    tests := []struct {
+        name          string
+        sources       []int
+        appendElement []int
+        want          []int
+    }{
+        {
+            name:          "添加新元素",
+            sources:       []int{1, 2, 3},
+            appendElement: []int{4, 5},
+            want:          []int{1, 2, 3, 4, 5},
+        },
+        {
+            name:          "添加重复元素",
+            sources:       []int{1, 2, 3},
+            appendElement: []int{2, 3, 4},
+            want:          []int{1, 2, 3, 4},
+        },
+        {
+            name:          "sources为空切片",
+            sources:       []int{},
+            appendElement: []int{1, 2, 3},
+            want:          []int{1, 2, 3},
+        },
+        {
+            name:          "appendElement为空切片",
+            sources:       []int{1, 2, 3},
+            appendElement: []int{},
+            want:          []int{1, 2, 3},
+        },
+        {
+            name:          "sources为nil",
+            sources:       nil,
+            appendElement: []int{1, 2, 3},
+            want:          []int{1, 2, 3},
+        },
+        {
+            name:          "appendElement为nil",
+            sources:       []int{1, 2, 3},
+            appendElement: nil,
+            want:          []int{1, 2, 3},
+        },
+        {
+            name:          "全部重复元素",
+            sources:       []int{1, 2, 3},
+            appendElement: []int{1, 2, 3},
+            want:          []int{1, 2, 3},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := SlicesUniqueAppend(tt.sources, tt.appendElement)
+            if !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueAppend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestSlicesUniqueAppendString(t *testing.T) {
+    tests := []struct {
+        name          string
+        sources       []string
+        appendElement []string
+        want          []string
+    }{
+        {
+            name:          "添加新字符串",
+            sources:       []string{"apple", "banana", "cherry"},
+            appendElement: []string{"date", "elderberry"},
+            want:          []string{"apple", "banana", "cherry", "date", "elderberry"},
+        },
+        {
+            name:          "添加重复字符串",
+            sources:       []string{"apple", "banana", "cherry"},
+            appendElement: []string{"banana", "cherry", "date"},
+            want:          []string{"apple", "banana", "cherry", "date"},
+        },
+        {
+            name:          "sources为空切片",
+            sources:       []string{},
+            appendElement: []string{"apple", "banana"},
+            want:          []string{"apple", "banana"},
+        },
+        {
+            name:          "appendElement为空切片",
+            sources:       []string{"apple", "banana"},
+            appendElement: []string{},
+            want:          []string{"apple", "banana"},
+        },
+        {
+            name:          "sources为nil",
+            sources:       nil,
+            appendElement: []string{"apple", "banana"},
+            want:          []string{"apple", "banana"},
+        },
+        {
+            name:          "appendElement为nil",
+            sources:       []string{"apple", "banana"},
+            appendElement: nil,
+            want:          []string{"apple", "banana"},
+        },
+        {
+            name:          "全部重复字符串",
+            sources:       []string{"apple", "banana"},
+            appendElement: []string{"apple", "banana"},
+            want:          []string{"apple", "banana"},
+        },
+        {
+            name:          "添加空字符串",
+            sources:       []string{"apple", "banana"},
+            appendElement: []string{""},
+            want:          []string{"apple", "banana", ""},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := SlicesUniqueAppend(tt.sources, tt.appendElement)
+            if !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueAppend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestSlicesUniqueAppendCustomType(t *testing.T) {
+    person1 := Person{"Alice", 25}
+    person2 := Person{"Bob", 30}
+    person3 := Person{"Charlie", 35}
+    person4 := Person{"David", 40}
+    person5 := Person{"Alice", 25} // 与person1值相同但是不同实例
+
+    tests := []struct {
+        name          string
+        sources       []Person
+        appendElement []Person
+        want          []Person
+    }{
+        {
+            name:          "添加新自定义类型元素",
+            sources:       []Person{person1, person2},
+            appendElement: []Person{person3, person4},
+            want:          []Person{person1, person2, person3, person4},
+        },
+        {
+            name:          "添加重复自定义类型元素",
+            sources:       []Person{person1, person2},
+            appendElement: []Person{person5, person3}, // person5与person1值相同
+            want:          []Person{person1, person2, person3},
+        },
+        {
+            name:          "sources为空切片",
+            sources:       []Person{},
+            appendElement: []Person{person1, person2},
+            want:          []Person{person1, person2},
+        },
+        {
+            name:          "appendElement为空切片",
+            sources:       []Person{person1, person2},
+            appendElement: []Person{},
+            want:          []Person{person1, person2},
+        },
+        {
+            name:          "sources为nil",
+            sources:       nil,
+            appendElement: []Person{person1, person2},
+            want:          []Person{person1, person2},
+        },
+        {
+            name:          "appendElement为nil",
+            sources:       []Person{person1, person2},
+            appendElement: nil,
+            want:          []Person{person1, person2},
+        },
+        {
+            name:          "全部重复自定义类型元素",
+            sources:       []Person{person1, person2},
+            appendElement: []Person{person1, person2},
+            want:          []Person{person1, person2},
+        },
+    }
+
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            got := SlicesUniqueAppend(tt.sources, tt.appendElement)
+            if !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("SlicesUniqueAppend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
