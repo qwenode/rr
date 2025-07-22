@@ -1,10 +1,12 @@
 package rr
 
+// 任意转为指针 20250722
 func ToPtr[T any](v T) *T {
     return &v
 }
 
-func To[T any](v *T) T {
+// 去掉指针 20250722
+func FromPtr[T any](v *T) T {
     if v == nil {
         var zero T
         return zero
