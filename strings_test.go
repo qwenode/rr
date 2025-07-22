@@ -1346,6 +1346,108 @@ func BenchmarkToSnake(b *testing.B) {
     benchmarkSnakeTest(b, toSnake)
 }
 
+// 测试 StringPrepend 函数
+func TestStringPrepend(t *testing.T) {
+    type args struct {
+        s      string
+        prefix string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        {
+            "正常前置拼接",
+            args{"world", "hello "},
+            "hello world",
+        },
+        {
+            "空前缀",
+            args{"test", ""},
+            "test",
+        },
+        {
+            "空字符串",
+            args{"", "prefix"},
+            "prefix",
+        },
+        {
+            "两个都为空",
+            args{"", ""},
+            "",
+        },
+        {
+            "中文字符串前置拼接",
+            args{"世界", "你好"},
+            "你好世界",
+        },
+        {
+            "数字字符串前置拼接",
+            args{"123", "456"},
+            "456123",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringPrepend(tt.args.s, tt.args.prefix); got != tt.want {
+                t.Errorf("StringPrepend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+// 测试 StringAppend 函数
+func TestStringAppend(t *testing.T) {
+    type args struct {
+        s      string
+        suffix string
+    }
+    tests := []struct {
+        name string
+        args args
+        want string
+    }{
+        {
+            "正常后置拼接",
+            args{"hello ", "world"},
+            "hello world",
+        },
+        {
+            "空后缀",
+            args{"test", ""},
+            "test",
+        },
+        {
+            "空字符串",
+            args{"", "suffix"},
+            "suffix",
+        },
+        {
+            "两个都为空",
+            args{"", ""},
+            "",
+        },
+        {
+            "中文字符串后置拼接",
+            args{"你好", "世界"},
+            "你好世界",
+        },
+        {
+            "数字字符串后置拼接",
+            args{"123", "456"},
+            "123456",
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            if got := StringAppend(tt.args.s, tt.args.suffix); got != tt.want {
+                t.Errorf("StringAppend() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
 func toSnakeWithIgnore(tb testing.TB) {
     cases := [][]string{
         {"testCase", "test_case"},

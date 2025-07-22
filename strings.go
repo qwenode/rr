@@ -259,12 +259,12 @@ func StringJoin(strs ...string) string {
 
 // 字符串前置拼接 20250617
 func StringPrepend(s, prefix string) string {
-    return StringJoin(prefix, s)
+    return prefix + s
 }
 
 // 字符串后置拼接 20250617
 func StringAppend(s, suffix string) string {
-    return StringJoin(s, suffix)
+    return s + suffix
 }
 
 // 字符串安全转换为主机名 20250617
