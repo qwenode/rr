@@ -9,6 +9,7 @@ import (
     "strings"
     "sync"
 
+    "github.com/ettle/strcase"
     "golang.org/x/text/cases"
     "golang.org/x/text/language"
 )
@@ -456,31 +457,6 @@ func StringLenBetween(s string, start, end int) bool {
     return i >= start && i < end
 }
 
-// 转换为snake_case 20250617
-func StringToSnake(s string) string {
-    return StringToDelimited(s, '_')
-}
-
-// 转换为snake_case(忽略指定字符) 20250617
-func StringToSnakeWithIgnore(s, ignore string) string {
-    return StringToScreamingDelimited(s, '_', ignore, false)
-}
-
-// 转换为SCREAMING_SNAKE_CASE 20250617
-func StringToScreamingSnake(s string) string {
-    return StringToScreamingDelimited(s, '_', "", true)
-}
-
-// 转换为kebab-case 20250617
-func StringToKebab(s string) string {
-    return StringToDelimited(s, '-')
-}
-
-// 转换为SCREAMING-KEBAB-CASE 20250617
-func StringToScreamingKebab(s string) string {
-    return StringToScreamingDelimited(s, '-', "", true)
-}
-
 // 转换为分隔符格式 20250617
 func StringToDelimited(s string, delimiter uint8) string {
     return StringToScreamingDelimited(s, delimiter, "", false)
@@ -538,66 +514,18 @@ func StringToScreamingDelimited(s string, delimiter uint8, ignore string, scream
     return n.String()
 }
 
-// 转换为CamelCase 20250617
-func StringToCamel(s string) string {
-    return stringToCamelInitCase(s, true)
-}
-
-// 转换为lowerCamelCase 20250617
-func StringToLowerCamel(s string) string {
-    return stringToCamelInitCase(s, false)
-}
+var (
+    StringToPascal = strcase.ToPascal
+    StringToCamel  = strcase.ToCamel
+    StringToKEBAB  = strcase.ToKEBAB
+    StringToKebab  = strcase.ToKebab
+    StringToSnake  = strcase.ToSnake
+    StringToSNAKE  = strcase.ToSNAKE
+)
 
 // 检查字符串是否包含指定子串 20250617
 func StringContains(s, v string) bool {
     return strings.Contains(s, v)
-}
-
-// 转换为CamelCase的内部函数 20250617
-func stringToCamelInitCase(s string, initCase bool) string {
-    s = StringTrimSpace(s)
-    if s == "" {
-        return s
-    }
-    a, hasAcronym := uppercaseAcronym.Load(s)
-    if hasAcronym {
-        s = a.(string)
-    }
-
-    n := strings.Builder{}
-    n.Grow(len(s))
-    capNext := initCase
-    prevIsCap := false
-    for i, v := range []byte(s) {
-        vIsCap := v >= 'A' && v <= 'Z'
-        vIsLow := v >= 'a' && v <= 'z'
-        if capNext {
-            if vIsLow {
-                v += 'A'
-                v -= 'a'
-            }
-        } else if i == 0 {
-            if vIsCap {
-                v += 'a'
-                v -= 'A'
-            }
-        } else if prevIsCap && vIsCap && !hasAcronym {
-            v += 'a'
-            v -= 'A'
-        }
-        prevIsCap = vIsCap
-
-        if vIsCap || vIsLow {
-            n.WriteByte(v)
-            capNext = false
-        } else if vIsNum := v >= '0' && v <= '9'; vIsNum {
-            n.WriteByte(v)
-            capNext = true
-        } else {
-            capNext = v == '_' || v == ' ' || v == '-' || v == '.'
-        }
-    }
-    return n.String()
 }
 
 type S string
