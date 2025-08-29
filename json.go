@@ -26,6 +26,9 @@ func JsonMarshalAsBytes(v interface{}) []byte {
     adapter, _ := JsonMarshalAdapter(v)
     return adapter
 }
+func JsonSerializeAsRawMessage(v any) json.RawMessage {
+    return JsonMarshalAsBytes(v)
+}
 func JsonMarshal(v interface{}) string {
     return string(JsonMarshalAsBytes(v))
 }
