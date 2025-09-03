@@ -9,6 +9,19 @@ import (
     "hash/crc32"
 )
 
+func BytesSha1(d []byte) string {
+    return fmt.Sprintf("%x", sha1.Sum(d))
+}
+func BytesSha256(d []byte) string {
+    return fmt.Sprintf("%x", sha256.Sum256(d))
+}
+func BytesSha512(d []byte) string {
+    return fmt.Sprintf("%x", sha512.Sum512(d))
+}
+func BytesMd5(d []byte) string {
+    return fmt.Sprintf("%x", md5.Sum(d))
+}
+
 type B []byte
 
 func NewB(v []byte) B {
