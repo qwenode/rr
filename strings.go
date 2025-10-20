@@ -122,6 +122,9 @@ func StringUrlDecode(s string) string {
     unescape, _ := url.QueryUnescape(s)
     return unescape
 }
+func StringUrlEncode(s string) string {
+    return url.QueryEscape(s)
+}
 
 // 字符串转float64 20250617
 func StringAsFloat(s string) float64 {
