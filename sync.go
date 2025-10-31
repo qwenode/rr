@@ -79,3 +79,62 @@ func (t *async) IsDone() bool {
 func (t *async) Done() <-chan struct{} {
     return t.doneCh
 }
+
+// -------------------- AsyncResult[T] --------------------
+
+// 支持有返回值的异步任务
+// 使用方式：
+//   res := AsyncResult(ctx, func(ctx context.Context) (T, error) { ... })
+//   v, err := res.Get()
+
+type asyncResult[T any] struct {
+    val    T
+    err    error
+    doneCh chan struct{}
+    once   sync.Once
+    done   atomic.Bool
+}
+
+// 泛型版本的任务接口
+type AsyncResultTask[T any] interface {
+    // Get 阻塞等待，返回结果与错误
+    Get() (T, error)
+    // IsDone 非阻塞检查是否完成
+    IsDone() bool
+    // Done 返回完成通知通道
+    Done() <-chan struct{}
+}
+
+// AsyncResult 启动一个带返回值的异步任务
+func AsyncResult[T any](ctx context.Context, fn func(ctx context.Context) (T, error)) AsyncResultTask[T] {
+    task := &asyncResult[T]{doneCh: make(chan struct{})}
+
+    go func() {
+        defer func() {
+            if r := recover(); r != nil {
+                task.err = fmt.Errorf("async result task panicked: %v", r)
+            }
+            task.once.Do(func() {
+                task.done.Store(true)
+                close(task.doneCh)
+            })
+        }()
+
+        v, err := fn(ctx)
+        task.val, task.err = v, err
+    }()
+
+    return task
+}
+
+// Get 阻塞等待并返回结果
+func (t *asyncResult[T]) Get() (T, error) {
+    <-t.doneCh
+    return t.val, t.err
+}
+
+// IsDone 非阻塞检查
+func (t *asyncResult[T]) IsDone() bool { return t.done.Load() }
+
+// Done 完成通知
+func (t *asyncResult[T]) Done() <-chan struct{} { return t.doneCh }
