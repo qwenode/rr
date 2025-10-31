@@ -73,3 +73,45 @@ func (t *asyncResult[T]) IsDone() bool {
     defer t.mu.Unlock()
     return t.done
 }
+
+type async struct {
+    mu     sync.Mutex
+    done   bool
+    err    error
+    wg     sync.WaitGroup
+    doneCh chan struct{}
+}
+
+// 启动一个异步任务
+func Async(ctx context.Context, fn func(ctx context.Context) error) *async {
+    task := &async{}
+    task.wg.Add(1)
+	
+    go func() {
+        defer task.wg.Done()
+
+        err := fn(ctx)
+
+        task.mu.Lock()
+        task.err = err
+        task.done = true
+        task.mu.Unlock()
+    }()
+
+    return task
+}
+
+// 阻塞等待任务完成
+func (t *async) Wait() error {
+    t.wg.Wait()
+    t.mu.Lock()
+    defer t.mu.Unlock()
+    return t.err
+}
+
+// 检查任务是否已完成（非阻塞）
+func (t *async) IsDone() bool {
+    t.mu.Lock()
+    defer t.mu.Unlock()
+    return t.done
+}
