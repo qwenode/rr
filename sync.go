@@ -2,6 +2,7 @@ package rr
 
 import (
     "context"
+    "fmt"
     "sync"
     "sync/atomic"
 )
@@ -31,87 +32,50 @@ func (o *Once) doSlow(callback func() error) error {
     return err
 }
 
-type asyncResult[T any] struct {
-    mu     sync.Mutex
-    done   bool
-    result T
-    err    error
-    wg     sync.WaitGroup
-}
-
-// 启动一个异步任务
-func AsyncWithResult[T any](ctx context.Context, fn func(ctx context.Context) (T, error)) *asyncResult[T] {
-    task := &asyncResult[T]{}
-    task.wg.Add(1)
-	
-    go func() {
-        defer task.wg.Done()
-
-        result, err := fn(ctx)
-
-        task.mu.Lock()
-        task.result = result
-        task.err = err
-        task.done = true
-        task.mu.Unlock()
-    }()
-
-    return task
-}
-
-// 阻塞等待任务完成并获取结果
-func (t *asyncResult[T]) Get() (T, error) {
-    t.wg.Wait()
-    t.mu.Lock()
-    defer t.mu.Unlock()
-    return t.result, t.err
-}
-
-// 检查任务是否已完成（非阻塞）
-func (t *asyncResult[T]) IsDone() bool {
-    t.mu.Lock()
-    defer t.mu.Unlock()
-    return t.done
-}
-
 type async struct {
-    mu     sync.Mutex
-    done   bool
     err    error
-    wg     sync.WaitGroup
     doneCh chan struct{}
+    once   sync.Once
+    done   atomic.Bool
+}
+type AsyncTask interface {
+    Get() error
+    IsDone() bool
+    Done() <-chan struct{}
 }
 
 // 启动一个异步任务
-func Async(ctx context.Context, fn func(ctx context.Context) error) *async {
-    task := &async{}
-    task.wg.Add(1)
-	
+func Async(ctx context.Context, fn func(ctx context.Context) error) AsyncTask {
+    task := &async{doneCh: make(chan struct{})}
+
     go func() {
-        defer task.wg.Done()
+        defer func() {
+            if r := recover(); r != nil {
+                task.err = fmt.Errorf("async task panicked: %v", r)
+            }
+            task.once.Do(func() {
+                task.done.Store(true)
+                close(task.doneCh)
+            })
+        }()
 
-        err := fn(ctx)
-
-        task.mu.Lock()
-        task.err = err
-        task.done = true
-        task.mu.Unlock()
+        task.err = fn(ctx)
     }()
 
     return task
 }
 
 // 阻塞等待任务完成
-func (t *async) Wait() error {
-    t.wg.Wait()
-    t.mu.Lock()
-    defer t.mu.Unlock()
+func (t *async) Get() error {
+    <-t.doneCh
     return t.err
 }
 
 // 检查任务是否已完成（非阻塞）
 func (t *async) IsDone() bool {
-    t.mu.Lock()
-    defer t.mu.Unlock()
-    return t.done
+    return t.done.Load()
+}
+
+func (t *async) Done() <-chan struct{} {
+    return t.doneCh
 }
