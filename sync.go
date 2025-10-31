@@ -138,3 +138,7 @@ func (t *asyncResult[T]) IsDone() bool { return t.done.Load() }
 
 // Done 完成通知
 func (t *asyncResult[T]) Done() <-chan struct{} { return t.doneCh }
+
+func AsyncSelect() {
+    
+}
