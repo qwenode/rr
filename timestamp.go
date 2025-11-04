@@ -25,6 +25,6 @@ func Unix() int64 {
 
 // 获取今天的日期，时间部分设为零
 func TimeGetToday() time.Time {
-    now := time.Now()
+    now := Utc()
     return time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 }
