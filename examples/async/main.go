@@ -19,7 +19,7 @@ import (
 //
 // 使用 go:generate 单独执行每个示例：
 //   - 在本目录下执行：go generate
-//   - 或运行某个示例：go run . -demo=1（1~6）
+//   - 或运行某个示例：go run . -demo=1（1~7）
 
 // 示例1：Async + 超时控制 + 轮询 IsDone
 //go:generate go run . -demo=1
@@ -33,8 +33,10 @@ import (
 //go:generate go run . -demo=5
 // 示例6：AsyncResult 扇出/聚合（并发多个任务再汇总）
 //go:generate go run . -demo=6
+// 示例7：HeartbeatWait 心跳等待（等待任务完成时定期执行心跳回调）
+//go:generate go run . -demo=7
 func main() {
-    demo := flag.Int("demo", 0, "选择要运行的示例(1~6); 0 或不传运行全部")
+    demo := flag.Int("demo", 0, "选择要运行的示例(1~7); 0 或不传运行全部")
     flag.Parse()
 
     if *demo == 0 {
@@ -44,6 +46,7 @@ func main() {
         demo4()
         demo5()
         demo6()
+        demo7()
         return
     }
 
@@ -60,6 +63,8 @@ func main() {
         demo5()
     case 6:
         demo6()
+    case 7:
+        demo7()
     default:
         log.Println("未知 demo 编号:", *demo)
     }
@@ -205,3 +210,94 @@ func demo6() {
     }
     log.Println("聚合结果: sum=", sum, " 首个错误=", firstErr)
 }
+
+// 示例7：HeartbeatWait 心跳等待（等待任务完成时定期执行心跳回调）
+func demo7() {
+    log.Println("示例7：HeartbeatWait 心跳等待（等待任务完成时定期执行心跳回调）")
+
+    // 场景1：正常完成 - 任务在心跳期间完成
+    log.Println("场景1：任务正常完成，观察心跳")
+    ctx1 := context.Background()
+    async1 := rr.Async(ctx1, func(ctx context.Context) error {
+        log.Println("  任务1开始执行...")
+        time.Sleep(2 * time.Second)
+        log.Println("  任务1执行完成")
+        return nil
+    })
+
+    heartbeatCount := 0
+    err := async1.HeartbeatWait(ctx1, 500*time.Millisecond, func() {
+        heartbeatCount++
+        log.Printf("  ❤️ 心跳 #%d - 任务仍在运行中...", heartbeatCount)
+    })
+    log.Println("  任务1结果: err=", err, " 心跳次数=", heartbeatCount)
+
+    // 场景2：超时取消 - 任务执行时间过长，通过 context 超时
+    log.Println("\n场景2：任务超时，心跳停止")
+    ctx2, cancel2 := context.WithTimeout(context.Background(), 1500*time.Millisecond)
+    defer cancel2()
+    async2 := rr.Async(ctx2, func(ctx context.Context) error {
+        log.Println("  任务2开始执行（会运行5秒）...")
+        select {
+        case <-time.After(5 * time.Second):
+            log.Println("  任务2正常完成")
+            return nil
+        case <-ctx.Done():
+            log.Println("  任务2被取消")
+            return ctx.Err()
+        }
+    })
+
+    heartbeatCount2 := 0
+    err2 := async2.HeartbeatWait(ctx2, 400*time.Millisecond, func() {
+        heartbeatCount2++
+        log.Printf("  ❤️ 心跳 #%d - 任务仍在运行中...", heartbeatCount2)
+    })
+    log.Println("  任务2结果: err=", err2, " 心跳次数=", heartbeatCount2)
+
+    // 场景3：主动取消 - 模拟外部取消
+    log.Println("\n场景3：主动取消任务")
+    ctx3, cancel3 := context.WithCancel(context.Background())
+    async3 := rr.Async(ctx3, func(ctx context.Context) error {
+        log.Println("  任务3开始执行...")
+        select {
+        case <-time.After(10 * time.Second):
+            return nil
+        case <-ctx.Done():
+            log.Println("  任务3收到取消信号")
+            return ctx.Err()
+        }
+    })
+
+    // 在后台goroutine中，模拟1秒后主动取消
+    go func() {
+        time.Sleep(1 * time.Second)
+        log.Println("  主动取消任务3")
+        cancel3()
+    }()
+
+    heartbeatCount3 := 0
+    err3 := async3.HeartbeatWait(ctx3, 300*time.Millisecond, func() {
+        heartbeatCount3++
+        log.Printf("  ❤️ 心跳 #%d", heartbeatCount3)
+    })
+    log.Println("  任务3结果: err=", err3, " 心跳次数=", heartbeatCount3)
+
+    // 场景4：任务失败返回错误
+    log.Println("\n场景4：任务执行失败")
+    ctx4 := context.Background()
+    async4 := rr.Async(ctx4, func(ctx context.Context) error {
+        log.Println("  任务4开始执行...")
+        time.Sleep(1 * time.Second)
+        log.Println("  任务4遇到错误")
+        return errors.New("任务执行失败")
+    })
+
+    heartbeatCount4 := 0
+    err4 := async4.HeartbeatWait(ctx4, 300*time.Millisecond, func() {
+        heartbeatCount4++
+        log.Printf("  ❤️ 心跳 #%d", heartbeatCount4)
+    })
+    log.Println("  任务4结果: err=", err4, " 心跳次数=", heartbeatCount4)
+}
+

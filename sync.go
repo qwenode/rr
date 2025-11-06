@@ -5,6 +5,7 @@ import (
     "fmt"
     "sync"
     "sync/atomic"
+    "time"
 )
 
 // 实现支持错误返回的once,并且执行失败的时候,第二次还会执行,直到成功
@@ -42,6 +43,7 @@ type AsyncTask interface {
     Get() error
     IsDone() bool
     Done() <-chan struct{}
+    HeartbeatWait(c context.Context, interval time.Duration, onHeartbeat func()) error
 }
 
 // 启动一个异步任务
@@ -63,6 +65,23 @@ func Async(ctx context.Context, fn func(ctx context.Context) error) AsyncTask {
     }()
 
     return task
+}
+func (t *async) HeartbeatWait(c context.Context, interval time.Duration, onHeartbeat func()) error {
+    ticker := time.NewTicker(interval)
+    defer ticker.Stop()
+    
+    for {
+        select {
+        case <-c.Done():
+            return c.Err()
+        case <-t.Done():
+            return t.err
+        case <-ticker.C:
+            if onHeartbeat != nil {
+                onHeartbeat()
+            }
+        }
+    }
 }
 
 // 阻塞等待任务完成
