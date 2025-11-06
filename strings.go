@@ -389,6 +389,12 @@ func StringSha1(s string) string {
     return fmt.Sprintf("%x", B([]byte(s)).Sha1())
 }
 
+// 计算字符串切片SHA1哈希 20250617
+func StringSha1Slice(text []string) string {
+    join := strings.Join(text, "")
+    return StringSha1(join)
+}
+
 // 计算字符串SHA256哈希 20250617
 func StringSha256(s string) string {
     if s == "" {
