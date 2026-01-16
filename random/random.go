@@ -3,6 +3,7 @@ package random
 import (
     crypto_rand "crypto/rand"
     "encoding/binary"
+	"errors"
     "math/big"
     "math/rand"
     "time"
@@ -49,7 +50,10 @@ var insecureRand *rand.Rand
 
 //  generate a random integer using a seed of current system time.
 func GetIntInsecure(i int) int {
-    return insecureRand.Intn(i)
+	if i <= 0 {
+		panic("random.GetIntInsecure: i must be > 0")
+	}
+	return insecureRand.Intn(i)
 }
 
 // String generates a cryptographically secure string.
@@ -82,8 +86,15 @@ func IntRange(min int, max int) int {
 }
 func Random(n int, charset string) string {
     var charsetByte = []byte(charset)
-    
-    s := make([]byte, n)
+
+	if n <= 0 {
+		n = 10
+	}
+	if len(charsetByte) == 0 {
+		return ""
+	}
+
+	s := make([]byte, n)
     
     var mrange int
     for i := range s {
@@ -98,6 +109,9 @@ func Random(n int, charset string) string {
 
 // Bytes generates a cryptographically secure set of bytes.
 func Bytes(n int) ([]byte, error) {
+	if n <= 0 {
+		return []byte{}, errors.New("random.Bytes: n must be > 0")
+	}
     b := make([]byte, n)
     _, err := crypto_rand.Read(b)
     if err != nil {
@@ -109,7 +123,9 @@ func Bytes(n int) ([]byte, error) {
 
 // Choice makes a random choice from a slice of string.
 func Choice(j []string) (string, error) {
+	if len(j) == 0 {
+		return "", errors.New("random.Choice: empty slice")
+	}
     i := getInt(len(j))
-    
     return j[i], nil
 }

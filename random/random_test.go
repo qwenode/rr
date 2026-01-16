@@ -71,9 +71,68 @@ func TestChoice(t *testing.T) {
         s = append(s, random_string)
     }
     for i := 0; i < 1000; i++ {
-        Choice(s)
+		_, err := Choice(s)
+		if err != nil {
+			t.Fatalf("Choice returned error unexpectedly: %v", err)
+		}
     }
     
+}
+
+func TestRandomEdges(t *testing.T) {
+	// Should not panic; n<=0 defaults to 10.
+	if got := Random(0, "abc"); len(got) != 10 {
+		t.Fatalf("Random(0,...) expected len=10, got len=%d (%q)", len(got), got)
+	}
+	if got := Random(-1, "abc"); len(got) != 10 {
+		t.Fatalf("Random(-1,...) expected len=10, got len=%d (%q)", len(got), got)
+	}
+	if got := Random(10, ""); got != "" {
+		t.Fatalf("Random(10,\"\") expected empty string, got %q", got)
+	}
+	if got := String(0); len(got) != 10 {
+		t.Fatalf("String(0) expected len=10, got len=%d (%q)", len(got), got)
+	}
+}
+
+func TestChoiceEmpty(t *testing.T) {
+	if _, err := Choice(nil); err == nil {
+		t.Fatalf("Choice(nil) expected error")
+	}
+	if _, err := Choice([]string{}); err == nil {
+		t.Fatalf("Choice(empty) expected error")
+	}
+}
+
+func TestBytesEdges(t *testing.T) {
+	b, err := Bytes(0)
+	if err == nil {
+		t.Fatalf("Bytes(0) expected err")
+	}
+	if len(b) != 0 {
+		t.Fatalf("Bytes(0) expected empty slice, got %d", len(b))
+	}
+	b, err = Bytes(-1)
+	if err == nil {
+		t.Fatalf("Bytes(-1) expected err")
+	}
+	if len(b) != 0 {
+		t.Fatalf("Bytes(-1) expected empty slice, got %d", len(b))
+	}
+}
+
+func TestGetIntInsecureEdges(t *testing.T) {
+	assertPanic := func(fn func(), name string) {
+		t.Helper()
+		defer func() {
+			if r := recover(); r == nil {
+				t.Fatalf("%s expected panic", name)
+			}
+		}()
+		fn()
+	}
+	assertPanic(func() { _ = GetIntInsecure(0) }, "GetIntInsecure(0)")
+	assertPanic(func() { _ = GetIntInsecure(-1) }, "GetIntInsecure(-1)")
 }
 
 func TestStringRange(t *testing.T) {
