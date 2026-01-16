@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
-	"rr/random"
+    "log"
+
+    "github.com/qwenode/rr/random"
 )
 
 func main() {
@@ -13,4 +14,15 @@ func main() {
 	for i := 0; i < 100; i++ {
 		log.Println(random.IntRange(0, 10))
 	}
+    
+    for i := 0; i < 10; i++ {
+        log.Println(random.IntRange(0,1),"AA")
+    }
+     for i := 0; i < 10; i++ {
+        log.Println(random.IntRange(0,2),"BB")
+    }
+     for i := 0; i < 10; i++ {
+       log.Println( random.IntRange(1,2),"CC")
+    }
+    
 }

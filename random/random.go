@@ -67,9 +67,18 @@ func StringRange(min int, max int) string {
 
 // IntRange returns a random integer between a given range.
 func IntRange(min int, max int) int {
-    i := getInt(max - min)
-    i += min
-    return i
+    // Normalize to an ascending range.
+    if min > max {
+        min, max = max, min
+    }
+    // Single-value range.
+    if min == max {
+        return min
+    }
+    // Inclusive range: [min, max]
+    n := (max - min) + 1
+    i := getInt(n)
+    return i + min
 }
 func Random(n int, charset string) string {
     var charsetByte = []byte(charset)
